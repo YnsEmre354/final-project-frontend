@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_screen.dart';
-import 'package:flutter_turkce_ogrenme_application/features/home/home_screen.dart';
 
 /*
 Duzeltilcek Hatalar {
@@ -47,10 +46,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
 
-      /// ✅ KRİTİK SATIR
       navigatorObservers: [routeObserver],
 
-      home: const HomeScreen(),
+      home: const LoginScreen(),
     );
   }
 }

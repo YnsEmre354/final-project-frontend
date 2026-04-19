@@ -9,14 +9,30 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _ConsumerScreenState();
 }
 
+/*
+
+KESİN YAPILACAKLAR
+
+bu ekranın state yönetimi - database kısmının düzeltilmesi - backend kısmının yapılması
+
+2/5 ders yapıldı yazıyor mesela onlar string onlar state le yapılması gerekli
+
+daha sonra bir ders tamamlanmadan diğer derse geçilmemesi lazım
+
+
+bu b1 b2 isimleri de backend den gelebilir db ile onlar yapılsın backend de ders adları olsun gibi
+
+*/
+
 class _ConsumerScreenState extends ConsumerState<HomeScreen> {
   late String username;
   @override
-  /* void initState() {
+  void initState() {
     super.initState();
     final useState = ref.read(userProvider);
     username = useState.logUserDto!.name + useState.logUserDto!.userName;
-  }*/
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,14 +41,13 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(color: const Color(0xFFE2E8F0), height: 1),
-        ),
+        centerTitle: false,
+        automaticallyImplyLeading: false,
+
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "Merhaba,",
               style: TextStyle(
                 color: Color(0xFF94A3B8),
@@ -41,22 +56,39 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             Text(
-              "aaaa",
-              style: TextStyle(
+              username,
+              style: const TextStyle(
                 color: Color(0xFF1E293B),
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
               ),
             ),
-            const SizedBox(width: 50),
-            TextButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              ),
-              child: Text(""),
-            ),
           ],
+        ),
+
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: IconButton(
+              icon: const Icon(
+                Icons.settings_outlined,
+                color: Color(0xFF1E293B),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: const Color(0xFFE2E8F0), height: 1),
         ),
       ),
       body: ListView(
@@ -73,10 +105,9 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
             const Color(0xFFEFF6FF),
             const Color(0xFFBFDBFE),
             [
-              _TopicData("Tanışma", "👋", completed: true),
-              _TopicData("Sayılar", "🔢", completed: true),
-              _TopicData("Renkler", "🎨"),
-              _TopicData("Aile", "👨‍👩‍👧"),
+              _TopicData("Writing", "✍️"),
+              _TopicData("Listening", "🎧"),
+              _TopicData("Reading", "📚", completed: true),
             ],
             completedCount: 2,
           ),
@@ -88,9 +119,9 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
             const Color(0xFFECFEFF),
             const Color(0xFFA5F3FC),
             [
-              _TopicData("Günlük Rutin", "☀️"),
-              _TopicData("Geçmiş Zaman", "⏳"),
-              _TopicData("Yol Tarifi", "🗺️", locked: true),
+              _TopicData("Writing", "✍️"),
+              _TopicData("Listening", "🎧"),
+              _TopicData("Reading", "📚", locked: true),
             ],
             completedCount: 0,
           ),
@@ -102,9 +133,9 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
             const Color(0xFFF5F3FF),
             const Color(0xFFDDD6FE),
             [
-              _TopicData("Gelecek Planları", "🚀", locked: true),
-              _TopicData("Duygular", "😊", locked: true),
-              _TopicData("İş Hayatı", "💼", locked: true),
+              _TopicData("Writing", "☀️"),
+              _TopicData("Listening", "⏳"),
+              _TopicData("Reading", "🗺️", locked: true),
             ],
             completedCount: 0,
             sectionLocked: true,
@@ -117,8 +148,39 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
             const Color(0xFFFFF7ED),
             const Color(0xFFFED7AA),
             [
-              _TopicData("Tartışma", "🗣️", locked: true),
-              _TopicData("Edebiyat", "📚", locked: true),
+              _TopicData("Writing", "✍️"),
+              _TopicData("Listening", "🎧"),
+              _TopicData("Reading", "📚", locked: true),
+            ],
+            completedCount: 0,
+            sectionLocked: true,
+          ),
+          const SizedBox(height: 16),
+          _levelSection(
+            "C1 — İleri Seviye",
+            "C1",
+            const Color(0xFFEA580C),
+            const Color(0xFFFFF7ED),
+            const Color(0xFFFED7AA),
+            [
+              _TopicData("Writing", "✍️"),
+              _TopicData("Listening", "🎧"),
+              _TopicData("Reading", "📚", locked: true),
+            ],
+            completedCount: 0,
+            sectionLocked: true,
+          ),
+          const SizedBox(height: 16),
+          _levelSection(
+            "C2 — İleri Seviye",
+            "C2",
+            const Color(0xFFEA580C),
+            const Color(0xFFFFF7ED),
+            const Color(0xFFFED7AA),
+            [
+              _TopicData("Writing", "✍️"),
+              _TopicData("Listening", "🎧"),
+              _TopicData("Reading", "📚", locked: true),
             ],
             completedCount: 0,
             sectionLocked: true,
@@ -129,7 +191,6 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // --- Günlük Hedef Kartı ---
   Widget _dailyGoalCard() {
     return Container(
       decoration: BoxDecoration(
@@ -218,7 +279,6 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // --- Section Label ---
   Widget _sectionLabel(String text) {
     return Text(
       text.toUpperCase(),
@@ -231,7 +291,6 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // --- Level Section ---
   Widget _levelSection(
     String title,
     String label,
@@ -245,7 +304,6 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
@@ -352,7 +410,6 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         const SizedBox(height: 10),
-        // Topics Grid
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -368,7 +425,6 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // --- Topic Card ---
   Widget _topicCard(
     _TopicData topic,
     Color color,

@@ -4,7 +4,7 @@ import 'package:flutter_turkce_ogrenme_application/data/enum/login_enum.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/register/register_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
-import 'package:flutter_turkce_ogrenme_application/features/settings/settings_screen.dart';
+import 'package:flutter_turkce_ogrenme_application/features/home/home_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/main.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -37,6 +37,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
   void didPopNext() {
     super.didPopNext();
     ref.read(loginProvider.notifier).loginClear();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.clear();
+    _passwordController.clear();
   }
 
   @override
@@ -181,7 +188,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SettingsScreen(),
+                                builder: (context) => HomeScreen(),
                               ),
                             );
                             break;
