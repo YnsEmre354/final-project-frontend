@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/settings/change_password/change_password_screen.dart';
-import 'package:flutter_turkce_ogrenme_application/data/models/log_user_dto.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/student/log_user_dto.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/settings/common_widgets/settings_tile.dart';
 import 'package:flutter_turkce_ogrenme_application/features/settings/edit_profile/edit_profile_screen.dart';

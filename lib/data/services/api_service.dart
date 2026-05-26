@@ -8,7 +8,7 @@ class ApiService {
   ApiService() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: 'https://192.168.x.xxx:7260/api',
+        baseUrl: 'https://192.168.1.70:7260/api',
         connectTimeout: Duration(seconds: 100),
         receiveTimeout: Duration(seconds: 300),
 

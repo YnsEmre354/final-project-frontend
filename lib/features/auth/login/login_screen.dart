@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/login_enum.dart';
+import 'package:flutter_turkce_ogrenme_application/data/services/ai_service.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/register/register_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
@@ -17,6 +18,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final AiService aiService = AiService();
   bool isPasswordObscure = true;
 
   @override
@@ -173,6 +175,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                 onPressed: loginState.isLoading
                     ? null
                     : () async {
+                        // bura değişti
                         final result = await ref
                             .read(loginProvider.notifier)
                             .login(

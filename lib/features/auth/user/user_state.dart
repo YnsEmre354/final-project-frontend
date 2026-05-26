@@ -1,4 +1,4 @@
-import 'package:flutter_turkce_ogrenme_application/data/models/log_user_dto.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/student/log_user_dto.dart';
 
 class UserState {
   final bool isLoading;

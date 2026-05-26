@@ -1,4 +1,4 @@
-import 'package:flutter_turkce_ogrenme_application/data/models/login_response_dto.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/student/login_response_dto.dart';
 
 class LoginState {
   final bool isLoading;

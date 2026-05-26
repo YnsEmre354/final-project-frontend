@@ -1,5 +1,5 @@
 import 'package:flutter_turkce_ogrenme_application/data/enum/login_enum.dart';
-import 'package:flutter_turkce_ogrenme_application/data/models/auth_storage.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/student/auth_storage.dart';
 import 'package:flutter_turkce_ogrenme_application/data/services/student_service.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_state.dart';
 import 'package:state_notifier/state_notifier.dart';

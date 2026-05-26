@@ -4,14 +4,17 @@ import 'package:flutter_turkce_ogrenme_application/data/enum/change_username_enu
 import 'package:flutter_turkce_ogrenme_application/data/enum/delete_user_enum.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/login_enum.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/register_enum.dart';
-import 'package:flutter_turkce_ogrenme_application/data/models/login_response_dto.dart';
-import 'package:flutter_turkce_ogrenme_application/data/models/log_user_dto.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/general_student_submit_rl_dto.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/general_student_submit_ws_dto.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/student/login_response_dto.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/student/log_user_dto.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/student/post_user_skill_enrollment_dto.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/student/unlock_next_level_enrollment_dto.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/user_skill_enrollment_dto.dart';
 import 'package:flutter_turkce_ogrenme_application/data/services/api_service.dart';
 
 class StudentService {
   final Dio _dio = ApiService().dio;
-
-  /// düzenlencek
 
   Future<List<dynamic>?> getStudents() async {
     try {
@@ -159,6 +162,168 @@ class StudentService {
           return DeleteUserResult.noDeleted;
       }
       return DeleteUserResult.error;
+    }
+  }
+
+  /*  Future<bool> submitStudentAnswer(
+    int level,
+    String studentAnswer,
+    String correctAnswer,
+    int skillType,
+  ) async {
+    try {
+      await _dio.post(
+        '/Student/submitStudentAnswer',
+        data: {
+          'levelType': level,
+          'studentAnswer': studentAnswer,
+          'correctAnswer': correctAnswer,
+        },
+      );
+
+      return true;
+    } catch (e) {
+      print("Hata: " + e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> submitStudentProgress(
+    int studentId,
+    int correctAnswers,
+    int totalQuestions,
+    int levelType,
+    int skillType,
+    int statusType,
+  ) async {
+    try {
+      await _dio.post(
+        'Student/submitStudentProgress',
+        data: {
+          'studentId': studentId,
+          'correctAnswers': correctAnswers,
+          'totalQuestions': totalQuestions,
+          'levelType': levelType,
+          'skillType': skillType,
+          'statusType': statusType,
+        },
+      );
+
+      return true;
+    } catch (e) {
+      print("Hata: " + e.toString());
+      return false;
+    }
+  }*/
+
+  Future<bool> submitStudentProgressRL(GeneralStudentSubmitRlDto dto) async {
+    try {
+      await _dio.post(
+        '/Student/submitStudentProgressRL',
+        data: {
+          'levelType': dto.levelType,
+          'skillType': dto.skillType,
+          'statusType': dto.statusType,
+          'correctCount': dto.correctCount,
+          'totalCount': dto.totalCount,
+        },
+      );
+
+      return true;
+    } catch (e) {
+      print("Hata: " + e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> submitStudentProgressWS(GeneralStudentSubmitWsDto dto) async {
+    try {
+      await _dio.post(
+        '/Student/submitStudentProgressWS',
+        data: {
+          'levelType': dto.levelType,
+          'skillType': dto.skillType,
+          'statusType': dto.statusType,
+          'aiScores': dto.aiScores,
+          'totalCount': dto.totalCount,
+        },
+      );
+
+      return true;
+    } catch (e) {
+      print("Hata: " + e.toString());
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getLevelPercentages(int levelType) async {
+    try {
+      final response = await _dio.get(
+        '/Student/getProgressPercentage/$levelType',
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      }
+      return null;
+    } catch (e) {
+      print("Yüzdeler çekilirken hata oluştu: $e");
+      return null;
+    }
+  }
+
+  Future<List<UserSkillEnrollmentDto>> getUserEnrollment() async {
+    try {
+      final response = await _dio.get('/Student/getUserSkillEntrollment');
+
+      if (response.statusCode == 200) {
+        List<dynamic> rawData = response.data['enrollments'];
+
+        List<UserSkillEnrollmentDto> enrollments = rawData
+            .map((json) => UserSkillEnrollmentDto.fromJson(json))
+            .toList();
+
+        return enrollments;
+      }
+
+      return [];
+    } catch (e) {
+      print("İlerleme çekilirken hata oluştu: $e");
+      return [];
+    }
+  }
+
+  Future<bool> postUserSkillEnrollment(PostUserSkillEnrollmentDto dto) async {
+    try {
+      await _dio.post(
+        '/Student/post-user-skill-enrollment',
+        data: {'skillType': dto.skillType, 'levelType': dto.levelType},
+      );
+
+      return true;
+    } catch (e) {
+      print("İlerleme gönderilirken hata oluştu: $e");
+      return false;
+    }
+  }
+
+  Future<bool> unlockNextLevelEnrollment(
+    UnlockNextLevelEnrollmentDto dto,
+  ) async {
+    try {
+      await _dio.post(
+        '/Student/unlock-next-level',
+        data: {
+          'skillType': dto.skillType,
+          'currentLevel': dto.currentLevel,
+          'nextLevel': dto.nextLevel,
+        },
+      );
+
+      return true;
+    } catch (e) {
+      print("Sıradaki level kilidi açılırken hata oluştu: $e");
+      return false;
     }
   }
 }

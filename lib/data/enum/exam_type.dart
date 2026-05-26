@@ -1,1 +1,1 @@
-enum ExamType { reading, listening, writing }
+enum ExamType { reading, listening, writing, speaking }
