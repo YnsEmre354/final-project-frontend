@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/login_enum.dart';
 import 'package:flutter_turkce_ogrenme_application/data/services/ai_service.dart';
+import 'package:flutter_turkce_ogrenme_application/features/admin/presentation/admin_login_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/register/register_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
@@ -20,6 +21,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
   final TextEditingController _passwordController = TextEditingController();
   final AiService aiService = AiService();
   bool isPasswordObscure = true;
+  int _adminTapCount = 0;
 
   @override
   void didChangeDependencies() {
@@ -65,6 +67,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _adminTapCount++;
+              });
+              if (_adminTapCount >= 3) {
+                _adminTapCount = 0;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminLoginScreen(),
+                  ),
+                );
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Icon(
+                Icons.shield_outlined,
+                color: Colors.grey.shade300,
+                size: 22,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
