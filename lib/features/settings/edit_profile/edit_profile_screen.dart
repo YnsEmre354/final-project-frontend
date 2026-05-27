@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/change_username_enum.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/delete_user_enum.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/student/auth_storage.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/settings/edit_profile/edit_profile_provider.dart';
@@ -177,6 +178,35 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 onTap: editState.isLoading
                     ? null
                     : () async {
+                        // Onay dialogü
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text("Hesabı Sil"),
+                            content: const Text(
+                              "Hesabınızı silmek istediğinizden emin misiniz? "
+                              "Bu işlem geri alınamaz.",
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: const Text("İptal"),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => Navigator.pop(ctx, true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: errorRed,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text("Sil"),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirmed != true) return;
+                        if (!context.mounted) return;
+
                         final result = await ref
                             .read(editProfileProvider.notifier)
                             .deleteUser();
@@ -184,12 +214,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
                         switch (result) {
                           case DeleteUserResult.success:
-                            _getScaffoldMessage("Hesap başarıyla silindi!");
-                            Navigator.push(
+                            // Token temizle
+                            await AuthStorage().deleteToken();
+                            if (!context.mounted) return;
+                            // Stack tamamen temizlenerek login'e git
+                            Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const LoginScreen(),
                               ),
+                              (route) => false,
                             );
                             break;
 

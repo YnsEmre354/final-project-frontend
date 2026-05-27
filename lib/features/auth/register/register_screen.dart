@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/register_enum.dart';
+import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/register/register_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/main.dart';
@@ -21,11 +22,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   final TextEditingController passwordController = TextEditingController();
   String? selectedValue;
   String? selectedGender;
+  bool _isPasswordObscure = true;
+  String _password = '';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  void _onPasswordChanged() {
+    setState(() {
+      _password = passwordController.text;
+    });
   }
 
   @override
@@ -35,6 +44,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     surnameController.dispose();
     usernameController.dispose();
     emailController.dispose();
+    passwordController.removeListener(_onPasswordChanged);
     passwordController.dispose();
     super.dispose();
   }
@@ -43,6 +53,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   void didPopNext() {
     super.didPopNext();
     ref.read(registerProvider.notifier).registerClear();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    passwordController.addListener(_onPasswordChanged);
   }
 
   @override
@@ -313,7 +329,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                     const SizedBox(height: 16),
                     TextField(
                       controller: passwordController,
-                      obscureText: true,
+                      obscureText: _isPasswordObscure,
                       decoration: InputDecoration(
                         hintText: "Şifre",
                         filled: true,
@@ -321,6 +337,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                         prefixIcon: Icon(
                           Icons.lock_outline_rounded,
                           color: Colors.grey.shade600,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordObscure
+                                ? Icons.visibility_off_rounded
+                                : Icons.visibility_rounded,
+                            color: Colors.grey.shade500,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordObscure = !_isPasswordObscure;
+                            });
+                          },
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 18,
@@ -342,7 +371,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    // Şifre şartları
+                    if (_password.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      _buildPasswordRequirements(duoBlue),
+                    ],
 
                     DropdownButtonFormField<String>(
                       value: selectedValue,
@@ -451,9 +484,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                 ),
                 child: ElevatedButton(
                   onPressed: registerState.isLoading
-                      ? null
-                      : () async {
-                          if (selectedValue == null) {
+                       ? null
+                       : () async {
+                           // Şifre şartı kontrolü
+                           final pw = passwordController.text;
+                           final hasMinLength = pw.length >= 8;
+                           final hasLetter = pw.contains(RegExp(r'[a-zA-Z]'));
+                           final hasDigit = pw.contains(RegExp(r'[0-9]'));
+                           if (!hasMinLength || !hasLetter || !hasDigit) {
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               SnackBar(
+                                 content: const Text(
+                                   "Şifre en az 8 karakter, 1 harf ve 1 rakam içermelidir.",
+                                 ),
+                                 backgroundColor: Colors.red.shade600,
+                                 behavior: SnackBarBehavior.floating,
+                                 shape: RoundedRectangleBorder(
+                                   borderRadius: BorderRadius.circular(12),
+                                 ),
+                               ),
+                             );
+                             return;
+                           }
+                           if (selectedValue == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: const Text(
@@ -494,15 +547,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                   ),
                                 ),
                               );
+                              ref
+                                  .read(registerProvider.notifier)
+                                  .registerClear();
+                              ref
+                                  .read(loginProvider.notifier)
+                                  .loginClear();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const LoginScreen(),
                                 ),
                               );
-                              ref
-                                  .read(registerProvider.notifier)
-                                  .registerClear();
                               break;
 
                             case RegisterEnumResult.emailTaken:
@@ -610,6 +666,52 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPasswordRequirements(Color duoBlue) {
+    final hasMinLength = _password.length >= 8;
+    final hasLetter = _password.contains(RegExp(r'[a-zA-Z]'));
+    final hasDigit = _password.contains(RegExp(r'[0-9]'));
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F7F7),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE5E5E5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildRequirementRow(hasMinLength, "En az 8 karakter"),
+          const SizedBox(height: 4),
+          _buildRequirementRow(hasLetter, "En az 1 harf"),
+          const SizedBox(height: 4),
+          _buildRequirementRow(hasDigit, "En az 1 rakam"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRequirementRow(bool isMet, String label) {
+    return Row(
+      children: [
+        Icon(
+          isMet ? Icons.check_circle_rounded : Icons.cancel_rounded,
+          size: 16,
+          color: isMet ? const Color(0xFF58CC02) : const Color(0xFFCBD5E1),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isMet ? const Color(0xFF58CC02) : const Color(0xFF94A3B8),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -43,6 +43,9 @@ class StudentService {
 
       return (LoginResult.error, null);
     } on DioException catch (e) {
+      if (e.response?.statusCode == 403) {
+        return (LoginResult.accountPassive, null);
+      }
       if (e.response?.statusCode == 401 ||
           e.response?.statusCode == 404 ||
           e.response?.statusCode == 400) {

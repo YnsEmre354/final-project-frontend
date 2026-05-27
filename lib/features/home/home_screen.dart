@@ -91,12 +91,17 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
        String keyLower = topicTitle.toLowerCase();
        String keyCap = topicTitle;
        int skillId = 1;
-       if (keyLower == 'reading') skillId = 1;
-       else if (keyLower == 'writing') skillId = 2;
-       else if (keyLower == 'listening') skillId = 3;
-       else if (keyLower == 'speaking') skillId = 4;
-       
-       dynamic val = map[keyLower] ?? map[keyCap] ?? map[skillId.toString()] ?? map[skillId];
+       if (keyLower == 'reading') {
+         skillId = 1;
+       } else if (keyLower == 'writing') {
+         skillId = 2;
+       } else if (keyLower == 'listening') {
+         skillId = 3;
+       } else if (keyLower == 'speaking') {
+         skillId = 4;
+       }
+
+       dynamic val = map[keyLower] ?? map[keyCap] ?? map[skillId.toString()];
        if (val != null) {
           if (val is num) return (val.toDouble() / 100.0).clamp(0.0, 1.0);
           if (val is String) return (double.tryParse(val) ?? 0.0) / 100.0;
@@ -195,7 +200,7 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             Text(
-              "$username $userLogin",
+              "@$userLogin",
               style: const TextStyle(
                 color: Color(0xFF1E293B),
                 fontSize: 20,
@@ -280,6 +285,23 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _dailyGoalCard() {
+    // Tüm seviyelerdeki tamamlanmış dersleri hesapla
+    int totalCompleted = 0;
+    int totalLessons = 0;
+    for (int level = 1; level <= 6; level++) {
+      final topics = _buildTopics(level);
+      final unlockedTopics = topics.where((t) => !t.locked).toList();
+      totalLessons += unlockedTopics.length;
+      totalCompleted += unlockedTopics.where((t) => t.completed).length;
+    }
+
+    final double progressFraction =
+        totalLessons > 0 ? (totalCompleted / totalLessons).clamp(0.0, 1.0) : 0.0;
+    final int progressPercent = (progressFraction * 100).round();
+    // Progress bar için 5 segment
+    final int filledSegments =
+        totalLessons > 0 ? (progressFraction * 5).round() : 0;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -332,7 +354,7 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                         height: 6,
                         margin: EdgeInsets.only(right: i < 4 ? 4 : 0),
                         decoration: BoxDecoration(
-                          color: i < 2
+                          color: i < filledSegments
                               ? Colors.white
                               : Colors.white.withOpacity(0.25),
                           borderRadius: BorderRadius.circular(99),
@@ -342,9 +364,11 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 5),
-                const Text(
-                  "2/5 ders tamamlandı",
-                  style: TextStyle(
+                Text(
+                  totalCompleted == 0
+                      ? "Bugün henüz ders tamamlanmadı"
+                      : "$totalCompleted/$totalLessons ders tamamlandı",
+                  style: const TextStyle(
                     color: Color(0xFF93C5FD),
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -354,9 +378,9 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const SizedBox(width: 14),
-          const Text(
-            "40%",
-            style: TextStyle(
+          Text(
+            "%$progressPercent",
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w900,
               fontSize: 24,

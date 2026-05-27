@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_turkce_ogrenme_application/data/models/student/auth_storage.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/settings/change_password/change_password_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/data/models/student/log_user_dto.dart';
@@ -177,12 +178,17 @@ class _SettingScreenState extends ConsumerState<SettingsScreen>
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
                   child: InkWell(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginScreen(),
-                      ),
-                    ),
+                    onTap: () async {
+                      await AuthStorage().deleteToken();
+                      if (!context.mounted) return;
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                        (route) => false,
+                      );
+                    },
                     borderRadius: BorderRadius.circular(14),
                     child: Padding(
                       padding: const EdgeInsets.all(16),

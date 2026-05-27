@@ -28,6 +28,12 @@ class LoginNotifier extends StateNotifier<LoginState> {
         // State'i başarılı olarak güncelle
         state = state.copyWith(isLoading: false, loginUser: response);
         return LoginResult.success;
+      } else if (result == LoginResult.accountPassive) {
+        state = state.copyWith(
+          isLoading: false,
+          error: "Hesabınız pasif durumdadır. Lütfen yönetici ile iletişime geçin.",
+        );
+        return LoginResult.accountPassive;
       } else if (result == LoginResult.invalidCredentials) {
         state = state.copyWith(
           isLoading: false,

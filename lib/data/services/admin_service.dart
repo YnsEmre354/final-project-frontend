@@ -60,28 +60,34 @@ class AdminService {
 
   Future<bool> softDeleteUser(String userId) async {
     try {
-      final response = await _dio.post("/Admin/soft-delete-user", data: userId);
+      final response = await _dio.post(
+        "/Admin/soft-delete-user",
+        queryParameters: {'userId': userId},
+      );
 
       if (response.statusCode == 200) {
         return true;
       }
       return false;
     } catch (e) {
-      print("Login Hatası: $e");
+      print("Soft delete hatası: $e");
       return false;
     }
   }
 
   Future<bool> activeUser(String userId) async {
     try {
-      final response = await _dio.post("/Admin/active-user", data: userId);
+      final response = await _dio.post(
+        "/Admin/active-user",
+        queryParameters: {'userId': userId},
+      );
 
       if (response.statusCode == 200) {
         return true;
       }
       return false;
     } catch (e) {
-      print("Login Hatası: $e");
+      print("Active user hatası: $e");
       return false;
     }
   }

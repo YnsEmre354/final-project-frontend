@@ -224,6 +224,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                             );
                             break;
 
+                          case LoginResult.accountPassive:
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text(
+                                  "Hesabınız pasif durumdadır. Lütfen yönetici ile iletişime geçin.",
+                                ),
+                                backgroundColor: Colors.orange.shade800,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            );
+                            break;
+
                           case LoginResult.invalidCredentials:
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -297,6 +312,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                 TextButton(
                   onPressed: () {
                     _resetControllers();
+                    ref.read(loginProvider.notifier).loginClear();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
