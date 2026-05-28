@@ -565,7 +565,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: const Text(
-                                    "Bu Email Adresi Zaten Kayıtlı!",
+                                    "Bu e-posta adresi sistemde zaten kayıtlı. Hesabınız pasif olabilir. Giriş yapmayı deneyin veya yönetici ile iletişime geçin.",
                                   ),
                                   backgroundColor: Colors.red.shade600,
                                   behavior: SnackBarBehavior.floating,
