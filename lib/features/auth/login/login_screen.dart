@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/login_enum.dart';
-import 'package:flutter_turkce_ogrenme_application/data/services/ai_service.dart';
 import 'package:flutter_turkce_ogrenme_application/features/admin/presentation/admin_login_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/register/register_screen.dart';
@@ -19,7 +18,6 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final AiService aiService = AiService();
   bool isPasswordObscure = true;
   int _adminTapCount = 0;
 
@@ -40,6 +38,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
   @override
   void didPopNext() {
     super.didPopNext();
+    _resetControllers();
     ref.read(loginProvider.notifier).loginClear();
   }
 
@@ -145,39 +144,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
               duoGray: duoGray,
             ),
             const SizedBox(height: 16),
-            /*TextField(
-              controller: _passwordController,
-              obscureText: isPasswordObscure,
-              decoration: InputDecoration(
-                hintText: "Şifre",
-                filled: true,
-                suffixIcon: IconButton(
-                  onPressed: _toggleVisibility,
-                  icon: Icon(
-                    isPasswordObscure
-                        ? Icons.visibility_off_rounded
-                        : Icons.visibility_rounded,
-                  ),
-                ),
-                fillColor: const Color(0xFFF7F7F7),
-                prefixIcon: Icon(
-                  Icons.lock_outline_rounded,
-                  color: Colors.grey.shade600,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 18,
-                  horizontal: 16,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(color: duoGray, width: 2),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(color: duoBlue, width: 2),
-                ),
-              ),
-            ),*/
             LoginTextField(
               controller: _passwordController,
               isObscureText: isPasswordObscure,
@@ -216,11 +182,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                         switch (result) {
                           case LoginResult.success:
                             await ref.read(userProvider.notifier).logUser();
-                            Navigator.push(
+                            _resetControllers();
+                            if (!context.mounted) return;
+                            Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => HomeScreen(),
                               ),
+                              (route) => false,
                             );
                             break;
 

@@ -182,80 +182,88 @@ class ExamNotifier extends StateNotifier<ExamState> {
     int rlExamCount = 5;
     int wsExamCount = 2;
 
-    if (type == ExamType.reading || type == ExamType.listening) {
-      int correctCount = 0;
-      for (int i = 1; i <= rlExamCount; i++) {
-        final answer = state.givenAnswers[i];
-        final questionData = state.visitedQuestions[i];
-        if (answer != null && questionData != null) {
-          String correctAns = "";
-          try {
-            correctAns = questionData.questions[0].correctAnswer as String;
-          } catch (e) {
-            print("finishExam correctAns extract error: $e");
-          }
-          if (correctAns.isNotEmpty && answer[0] == correctAns[0]) {
-            correctCount++;
+    try {
+      if (type == ExamType.reading || type == ExamType.listening) {
+        int correctCount = 0;
+        for (int i = 1; i <= rlExamCount; i++) {
+          final answer = state.givenAnswers[i];
+          final questionData = state.visitedQuestions[i];
+          if (answer != null && questionData != null) {
+            String correctAns = "";
+            try {
+              correctAns = questionData.questions[0].correctAnswer as String;
+            } catch (e) {
+              print("finishExam correctAns extract error: $e");
+            }
+            if (correctAns.isNotEmpty && answer[0] == correctAns[0]) {
+              correctCount++;
+            }
           }
         }
-      }
 
-      final dto = GeneralStudentSubmitRlDto(
-        levelType: lv,
-        skillType: sk,
-        statusType: 1, // Status types: completed = 1
-        correctCount: correctCount,
-        totalCount: rlExamCount,
-      );
+        final dto = GeneralStudentSubmitRlDto(
+          levelType: lv,
+          skillType: sk,
+          statusType: 1, // Status types: completed = 1
+          correctCount: correctCount,
+          totalCount: rlExamCount,
+        );
 
-      final isSuccess = await _studentService.submitStudentProgressRL(dto);
-      if (isSuccess) {
-        await _studentService.postUserSkillEnrollment(
-          PostUserSkillEnrollmentDto(skillType: sk, levelType: lv),
-        );
-        final int rlScore = rlExamCount > 0
-            ? (correctCount / rlExamCount * 1000).round()
-            : 0;
-        await _scoreboardService.postDailyScore(
-          PostScoreboardDto(point: rlScore, skillType: sk, levelType: lv),
-        );
-      }
-      state = state.copyWith(isLoading: false, isExamFinished: isSuccess);
-      return isSuccess;
-    } else {
-      List<int> aiScores = [];
-      for (int i = 1; i <= wsExamCount; i++) {
-        if (type == ExamType.writing) {
-          final eval = state.writingEvaluations[i];
-          aiScores.add(eval?.score ?? 0);
-        } else {
-          final eval = state.speakingEvaluations[i];
-          aiScores.add(eval?.score ?? 0);
+        final isSuccess = await _studentService.submitStudentProgressRL(dto);
+        if (isSuccess) {
+          await _studentService.postUserSkillEnrollment(
+            PostUserSkillEnrollmentDto(skillType: sk, levelType: lv),
+          );
+          final int rlScore = rlExamCount > 0
+              ? (correctCount / rlExamCount * 1000).round()
+              : 0;
+          await _scoreboardService.postDailyScore(
+            PostScoreboardDto(point: rlScore, skillType: sk, levelType: lv),
+          );
         }
-      }
+        state = state.copyWith(isLoading: false, isExamFinished: isSuccess);
+        return isSuccess;
+      } else {
+        List<int> aiScores = [];
+        for (int i = 1; i <= wsExamCount; i++) {
+          if (type == ExamType.writing) {
+            final eval = state.writingEvaluations[i];
+            aiScores.add(eval?.score ?? 0);
+          } else {
+            final eval = state.speakingEvaluations[i];
+            aiScores.add(eval?.score ?? 0);
+          }
+        }
 
-      final dto = GeneralStudentSubmitWsDto(
-        levelType: lv,
-        skillType: sk,
-        statusType: 1, // completed = 1
-        aiScores: aiScores,
-        totalCount: wsExamCount,
+        final dto = GeneralStudentSubmitWsDto(
+          levelType: lv,
+          skillType: sk,
+          statusType: 1, // completed = 1
+          aiScores: aiScores,
+          totalCount: wsExamCount,
+        );
+
+        final isSuccess = await _studentService.submitStudentProgressWS(dto);
+        if (isSuccess) {
+          await _studentService.postUserSkillEnrollment(
+            PostUserSkillEnrollmentDto(skillType: sk, levelType: lv),
+          );
+          final int avgScore = aiScores.isEmpty
+              ? 0
+              : (aiScores.reduce((a, b) => a + b) / aiScores.length * 10).round();
+          await _scoreboardService.postDailyScore(
+            PostScoreboardDto(point: avgScore, skillType: sk, levelType: lv),
+          );
+        }
+        state = state.copyWith(isLoading: false, isExamFinished: isSuccess);
+        return isSuccess;
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().replaceAll("Exception: ", ""),
       );
-
-      final isSuccess = await _studentService.submitStudentProgressWS(dto);
-      if (isSuccess) {
-        await _studentService.postUserSkillEnrollment(
-          PostUserSkillEnrollmentDto(skillType: sk, levelType: lv),
-        );
-        final int avgScore = aiScores.isEmpty
-            ? 0
-            : (aiScores.reduce((a, b) => a + b) / aiScores.length * 10).round();
-        await _scoreboardService.postDailyScore(
-          PostScoreboardDto(point: avgScore, skillType: sk, levelType: lv),
-        );
-      }
-      state = state.copyWith(isLoading: false, isExamFinished: isSuccess);
-      return isSuccess;
+      return false;
     }
   }
 }

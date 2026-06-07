@@ -7,6 +7,7 @@ import 'package:flutter_turkce_ogrenme_application/data/models/student/log_user_
 import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/settings/common_widgets/settings_tile.dart';
 import 'package:flutter_turkce_ogrenme_application/features/settings/edit_profile/edit_profile_screen.dart';
+import 'package:flutter_turkce_ogrenme_application/features/settings/notifications_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/main.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -40,7 +41,6 @@ class _SettingScreenState extends ConsumerState<SettingsScreen>
   static const _duoGray = Color(0xFFE5E5E5);
 
   var dailyGoal = 15;
-  bool isNotification = false;
 
   @override
   Widget build(BuildContext context) {
@@ -117,9 +117,9 @@ class _SettingScreenState extends ConsumerState<SettingsScreen>
                       title: 'Bildirimler',
                       subtitle: 'Günlük Hatırlatıcı',
                       trailing: Switch(
-                        value: isNotification,
+                        value: ref.watch(notificationsProvider),
                         onChanged: (value) {
-                          setState(() => isNotification = value);
+                          ref.read(notificationsProvider.notifier).toggle(value);
                         },
                         activeColor: _duoBlue,
                       ),

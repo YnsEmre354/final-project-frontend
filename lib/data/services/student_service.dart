@@ -131,21 +131,18 @@ class StudentService {
   }) async {
     try {
       await _dio.post('/Student/change-username', data: {'username': username});
-
       return ChangeUsernameResult.success;
     } on DioException catch (e) {
       if (e.response?.statusCode == 409) {
+        // 409 = kullanıcı adı zaten alınmış
+        return ChangeUsernameResult.usernameTaken;
+      }
+      if (e.response?.statusCode == 400) {
+        // 400 = aynı kullanıcı adı gönderildi (değişiklik yok)
         return ChangeUsernameResult.noChange;
       }
-
       if (e.response?.statusCode == 404) {
         return ChangeUsernameResult.userNotFound;
-      }
-
-      if (e.response?.statusCode == 200) {
-        if (e.response?.statusMessage == "username-no-changed") {
-          return ChangeUsernameResult.noChange;
-        }
       }
       return ChangeUsernameResult.error;
     }
@@ -168,56 +165,8 @@ class StudentService {
     }
   }
 
-  /*  Future<bool> submitStudentAnswer(
-    int level,
-    String studentAnswer,
-    String correctAnswer,
-    int skillType,
-  ) async {
-    try {
-      await _dio.post(
-        '/Student/submitStudentAnswer',
-        data: {
-          'levelType': level,
-          'studentAnswer': studentAnswer,
-          'correctAnswer': correctAnswer,
-        },
-      );
 
-      return true;
-    } catch (e) {
-      print("Hata: " + e.toString());
-      return false;
-    }
-  }
 
-  Future<bool> submitStudentProgress(
-    int studentId,
-    int correctAnswers,
-    int totalQuestions,
-    int levelType,
-    int skillType,
-    int statusType,
-  ) async {
-    try {
-      await _dio.post(
-        'Student/submitStudentProgress',
-        data: {
-          'studentId': studentId,
-          'correctAnswers': correctAnswers,
-          'totalQuestions': totalQuestions,
-          'levelType': levelType,
-          'skillType': skillType,
-          'statusType': statusType,
-        },
-      );
-
-      return true;
-    } catch (e) {
-      print("Hata: " + e.toString());
-      return false;
-    }
-  }*/
 
   Future<bool> submitStudentProgressRL(GeneralStudentSubmitRlDto dto) async {
     try {
@@ -233,9 +182,16 @@ class StudentService {
       );
 
       return true;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        throw Exception("Sunucuya ulaşılamıyor (Zaman Aşımı).");
+      } else if (e.type == DioExceptionType.connectionError) {
+        throw Exception("İnternet bağlantınız kopmuş olabilir.");
+      }
+      throw Exception("Ağ Hatası: Lütfen bağlantınızı kontrol edin.");
     } catch (e) {
-      print("Hata: " + e.toString());
-      return false;
+      throw Exception("Beklenmeyen bir hata oluştu: $e");
     }
   }
 
@@ -253,9 +209,16 @@ class StudentService {
       );
 
       return true;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        throw Exception("Sunucuya ulaşılamıyor (Zaman Aşımı).");
+      } else if (e.type == DioExceptionType.connectionError) {
+        throw Exception("İnternet bağlantınız kopmuş olabilir.");
+      }
+      throw Exception("Ağ Hatası: Lütfen bağlantınızı kontrol edin.");
     } catch (e) {
-      print("Hata: " + e.toString());
-      return false;
+      throw Exception("Beklenmeyen bir hata oluştu: $e");
     }
   }
 
@@ -304,9 +267,16 @@ class StudentService {
       );
 
       return true;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        throw Exception("Sunucuya ulaşılamıyor (Zaman Aşımı).");
+      } else if (e.type == DioExceptionType.connectionError) {
+        throw Exception("İnternet bağlantınız kopmuş olabilir.");
+      }
+      throw Exception("Ağ Hatası: Lütfen bağlantınızı kontrol edin.");
     } catch (e) {
-      print("İlerleme gönderilirken hata oluştu: $e");
-      return false;
+      throw Exception("İlerleme gönderilirken hata oluştu: $e");
     }
   }
 
@@ -324,9 +294,16 @@ class StudentService {
       );
 
       return true;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        throw Exception("Sunucuya ulaşılamıyor (Zaman Aşımı).");
+      } else if (e.type == DioExceptionType.connectionError) {
+        throw Exception("İnternet bağlantınız kopmuş olabilir.");
+      }
+      throw Exception("Ağ Hatası: Lütfen bağlantınızı kontrol edin.");
     } catch (e) {
-      print("Sıradaki level kilidi açılırken hata oluştu: $e");
-      return false;
+      throw Exception("Sıradaki level kilidi açılırken hata oluştu: $e");
     }
   }
 }

@@ -29,7 +29,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       text: userState.logUserDto!.userName,
     );
     _nameSurnameController = TextEditingController(
-      text: userState.logUserDto!.name + userState.logUserDto!.surname,
+      text: '${userState.logUserDto!.name} ${userState.logUserDto!.surname}',
     );
     _emailController = TextEditingController(text: userState.logUserDto!.email);
   }
@@ -38,6 +38,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void dispose() {
     _usernameController.dispose();
     _nameSurnameController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 

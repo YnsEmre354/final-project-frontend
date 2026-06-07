@@ -1633,9 +1633,10 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
 
                   final isSuccess = await notifier.finishExam();
                   if (context.mounted && isSuccess) {
-                    Navigator.push(
+                    Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (context) => HomeScreen()),
+                      (route) => false,
                     );
                   } else if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(

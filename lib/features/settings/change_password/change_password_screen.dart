@@ -278,6 +278,7 @@ class _ChangePasswordScreen extends ConsumerState<ChangePasswordScreen>
                               newPassword: newPasswordController1.text,
                             );
                         if (result == ChangePasswordResult.success) {
+                          if (!context.mounted) return;
                           _showSuccessMessage(context);
                           Navigator.pop(context);
                         }

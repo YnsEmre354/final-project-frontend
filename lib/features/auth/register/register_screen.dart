@@ -457,8 +457,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                         ),
                       ),
                       items: const [
-                        DropdownMenuItem(value: 'man', child: Text("Erkek")),
-                        DropdownMenuItem(value: 'male', child: Text("Kadın")),
+                        DropdownMenuItem(value: 'male', child: Text("Erkek")),
+                        DropdownMenuItem(value: 'female', child: Text("Kadın")),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -520,6 +520,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             );
                             return;
                           }
+                          if (selectedGender == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text(
+                                  "Lütfen cinsiyetinizi seçiniz.",
+                                ),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            );
+                            return;
+                          }
                           final result = await ref
                               .read(registerProvider.notifier)
                               .register(
@@ -553,12 +567,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                               ref
                                   .read(loginProvider.notifier)
                                   .loginClear();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginScreen(),
-                                ),
-                              );
+                              // RegisterScreen'i kapat, mevcut LoginScreen'e dön
+                              Navigator.pop(context);
                               break;
 
                             case RegisterEnumResult.emailTaken:

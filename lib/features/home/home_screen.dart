@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_turkce_ogrenme_application/core/services/local_notification_service.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
+import 'package:flutter_turkce_ogrenme_application/features/settings/notifications_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/settings/settings_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/exam_type.dart';
 import 'package:flutter_turkce_ogrenme_application/data/services/student_service.dart';
@@ -42,8 +44,8 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     final useState = ref.read(userProvider);
-    username = useState.logUserDto!.name;
-    userLogin = useState.logUserDto!.userName;
+    username = useState.logUserDto?.name ?? '';
+    userLogin = useState.logUserDto?.userName ?? '';
     _fetchProgress();
   }
 
@@ -63,26 +65,61 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _unlockNextLevel(int currentLevel) async {
+    final nextLevel = currentLevel + 1;
+    final levelName = _levelName(nextLevel);
     final dto = UnlockNextLevelEnrollmentDto(
       skillType: 0,
       currentLevel: currentLevel,
-      nextLevel: currentLevel + 1,
+      nextLevel: nextLevel,
     );
-    final res = await _studentService.unlockNextLevelEnrollment(dto);
-    if (res) {
-       await _fetchProgress();
+    // Bildirim ayarını oku
+    final notificationsEnabled = ref.read(notificationsProvider);
+    try {
+      final res = await _studentService.unlockNextLevelEnrollment(dto);
+      if (res) {
+         await _fetchProgress();
+         if (notificationsEnabled) {
+           await LocalNotificationService.show(
+             id: 1001,
+             title: '🎉 Seviye Kilidi Açıldı!',
+             body: '$levelName seviyesi artık kullanımınıza açıktır. İyi çalışmalar!',
+           );
+         }
+      } else {
+         if (mounted && notificationsEnabled) {
+           await LocalNotificationService.show(
+             id: 1002,
+             title: 'Seviye Kilidi Açılamadı',
+             body: 'Mevcut seviyenin tüm derslerini tamamlayın.',
+           );
+         }
+      }
+    } catch (e) {
        if (mounted) {
+         // Hata bildirimleri her zaman gösterilir
          ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(content: Text("Sonraki seviyenin kilidi açıldı!", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green),
-         );
-       }
-    } else {
-       if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(content: Text("Mevcut seviyenin tüm seviyesini başarıyla bitirin!"), backgroundColor: Colors.red),
+           SnackBar(
+             content: Text(e.toString().replaceAll('Exception: ', '')),
+             backgroundColor: Colors.orange.shade800,
+             behavior: SnackBarBehavior.floating,
+             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+           ),
          );
        }
     }
+  }
+
+  // levelType int değerini okunabilir seviye adına çevirir
+  String _levelName(int levelType) {
+    return switch (levelType) {
+      1 => 'A1',
+      2 => 'A2',
+      3 => 'B1',
+      4 => 'B2',
+      5 => 'C1',
+      6 => 'C2',
+      _ => 'Sonraki',
+    };
   }
 
   double _getTopicProgress(int levelType, String topicTitle) {
