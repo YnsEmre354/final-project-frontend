@@ -10,15 +10,18 @@ class LocalNotificationService {
   static Future<void> init() async {
     if (_initialized) return;
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const initSettings = InitializationSettings(android: androidSettings);
 
-    await _plugin.initialize(initSettings);
+    await _plugin.initialize(settings: initSettings);
 
     // Android 13+ için çalışma zamanında bildirim izni iste
     await _plugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
 
     _initialized = true;
@@ -44,6 +47,11 @@ class LocalNotificationService {
     );
 
     final details = NotificationDetails(android: androidDetails);
-    await _plugin.show(id, title, body, details);
+    await _plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
+    );
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/data/models/general_student_submit_rl_dto.dart';
 import 'package:flutter_turkce_ogrenme_application/data/models/general_student_submit_ws_dto.dart';
 import 'package:flutter_turkce_ogrenme_application/data/models/speaking/speaking_evaluation_request_dto.dart';
@@ -7,19 +6,20 @@ import 'package:flutter_turkce_ogrenme_application/data/models/writing/writing_e
 import 'package:flutter_turkce_ogrenme_application/data/services/ai_service.dart';
 import 'package:flutter_turkce_ogrenme_application/data/services/student_service.dart';
 import 'package:flutter_turkce_ogrenme_application/features/placement/placement_state.dart';
+import 'package:state_notifier/state_notifier.dart';
 
 class PlacementNotifier extends StateNotifier<PlacementState> {
   final AiService _aiService;
   final StudentService _studentService;
 
   PlacementNotifier(this._aiService, this._studentService)
-      : super(PlacementState()) {
+    : super(PlacementState()) {
     _loadCurrentQuestion();
   }
 
   Future<void> _loadCurrentQuestion() async {
     state = state.copyWith(isLoading: true, clearError: true);
-    
+
     try {
       if (state.currentStep == PlacementStep.reading) {
         final q = await _aiService.getReading('B2', state.currentQuestionIndex);
@@ -29,7 +29,10 @@ class PlacementNotifier extends StateNotifier<PlacementState> {
           state = state.copyWith(error: 'Soru getirilemedi', isLoading: false);
         }
       } else if (state.currentStep == PlacementStep.listening) {
-        final q = await _aiService.getListening('B2', state.currentQuestionIndex);
+        final q = await _aiService.getListening(
+          'B2',
+          state.currentQuestionIndex,
+        );
         if (q != null) {
           state = state.copyWith(currentListening: q, isLoading: false);
         } else {
@@ -71,17 +74,28 @@ class PlacementNotifier extends StateNotifier<PlacementState> {
     if (state.currentStep == PlacementStep.reading) {
       final totalReadingQuestions = state.currentReading?.questions.length ?? 3;
       if (state.currentQuestionIndex < totalReadingQuestions) {
-        state = state.copyWith(currentQuestionIndex: state.currentQuestionIndex + 1);
+        state = state.copyWith(
+          currentQuestionIndex: state.currentQuestionIndex + 1,
+        );
       } else {
-        state = state.copyWith(currentStep: PlacementStep.listening, currentQuestionIndex: 1);
+        state = state.copyWith(
+          currentStep: PlacementStep.listening,
+          currentQuestionIndex: 1,
+        );
         await _loadCurrentQuestion();
       }
     } else if (state.currentStep == PlacementStep.listening) {
-      final totalListeningQuestions = state.currentListening?.questions.length ?? 3;
+      final totalListeningQuestions =
+          state.currentListening?.questions.length ?? 3;
       if (state.currentQuestionIndex < totalListeningQuestions) {
-        state = state.copyWith(currentQuestionIndex: state.currentQuestionIndex + 1);
+        state = state.copyWith(
+          currentQuestionIndex: state.currentQuestionIndex + 1,
+        );
       } else {
-        state = state.copyWith(currentStep: PlacementStep.writing, currentQuestionIndex: 1);
+        state = state.copyWith(
+          currentStep: PlacementStep.writing,
+          currentQuestionIndex: 1,
+        );
         await _loadCurrentQuestion();
       }
     }
@@ -94,7 +108,7 @@ class PlacementNotifier extends StateNotifier<PlacementState> {
     final dto = WritingEvaluationRequestDto(
       level: 'B2', // B2 kriterlerine göre değerlendirilir
       userText: userText,
-      topic: state.currentWriting!.topic,
+      topic: state.currentWriting!.title,
       instructions: state.currentWriting!.instructions,
     );
 
@@ -108,7 +122,10 @@ class PlacementNotifier extends StateNotifier<PlacementState> {
       );
       await _loadCurrentQuestion();
     } else {
-      state = state.copyWith(error: 'Değerlendirme yapılamadı', isLoading: false);
+      state = state.copyWith(
+        error: 'Değerlendirme yapılamadı',
+        isLoading: false,
+      );
     }
   }
 
@@ -118,7 +135,7 @@ class PlacementNotifier extends StateNotifier<PlacementState> {
 
     final dto = SpeakingEvaluationRequestDto(
       level: 'B2', // B2 kriterlerine göre değerlendirilir
-      topic: state.currentSpeaking!.topic,
+      topic: state.currentSpeaking!.title,
       instructions: state.currentSpeaking!.instructions,
       audioFilePath: audioPath,
     );
@@ -132,7 +149,10 @@ class PlacementNotifier extends StateNotifier<PlacementState> {
       );
       await _calculateAndSaveResult();
     } else {
-      state = state.copyWith(error: 'Değerlendirme yapılamadı', isLoading: false);
+      state = state.copyWith(
+        error: 'Değerlendirme yapılamadı',
+        isLoading: false,
+      );
     }
   }
 
@@ -164,48 +184,93 @@ class PlacementNotifier extends StateNotifier<PlacementState> {
 
     // 2. Skoru hesapla
     double rScore = totalReading > 0 ? (readingCorrect / totalReading) : 0;
-    double lScore = totalListening > 0 ? (listeningCorrect / totalListening) : 0;
+    double lScore = totalListening > 0
+        ? (listeningCorrect / totalListening)
+        : 0;
     double wScore = state.writingScore / 100.0;
     double sScore = state.speakingScore / 100.0;
 
     double totalScore = (rScore + lScore + wScore + sScore) / 4.0;
-    
+
     int levelInt = 1;
     String levelStr = 'A1';
 
-    if (totalScore <= 0.30) { levelInt = 1; levelStr = 'A1'; }
-    else if (totalScore <= 0.50) { levelInt = 2; levelStr = 'A2'; }
-    else if (totalScore <= 0.65) { levelInt = 3; levelStr = 'B1'; }
-    else if (totalScore <= 0.80) { levelInt = 4; levelStr = 'B2'; }
-    else { levelInt = 5; levelStr = 'C1'; }
+    if (totalScore <= 0.30) {
+      levelInt = 1;
+      levelStr = 'A1';
+    } else if (totalScore <= 0.50) {
+      levelInt = 2;
+      levelStr = 'A2';
+    } else if (totalScore <= 0.65) {
+      levelInt = 3;
+      levelStr = 'B1';
+    } else if (totalScore <= 0.80) {
+      levelInt = 4;
+      levelStr = 'B2';
+    } else {
+      levelInt = 5;
+      levelStr = 'C1';
+    }
 
     // 3. DB Kayıt (Dummy veriler ve asıl level)
     try {
       for (int l = 1; l <= levelInt; l++) {
         // Her skill için
         // Reading (1)
-        await _studentService.submitStudentProgressRL(GeneralStudentSubmitRlDto(
-          levelType: l, skillType: 1, statusType: 3, correctCount: 3, totalCount: 3,
-        ));
+        await _studentService.submitStudentProgressRL(
+          GeneralStudentSubmitRlDto(
+            levelType: l,
+            skillType: 1,
+            statusType: 3,
+            correctCount: 3,
+            totalCount: 3,
+          ),
+        );
         // Listening (3)
-        await _studentService.submitStudentProgressRL(GeneralStudentSubmitRlDto(
-          levelType: l, skillType: 3, statusType: 3, correctCount: 3, totalCount: 3,
-        ));
+        await _studentService.submitStudentProgressRL(
+          GeneralStudentSubmitRlDto(
+            levelType: l,
+            skillType: 3,
+            statusType: 3,
+            correctCount: 3,
+            totalCount: 3,
+          ),
+        );
         // Writing (2)
-        await _studentService.submitStudentProgressWS(GeneralStudentSubmitWsDto(
-          levelType: l, skillType: 2, statusType: 3, aiScores: [90], totalCount: 1,
-        ));
+        await _studentService.submitStudentProgressWS(
+          GeneralStudentSubmitWsDto(
+            levelType: l,
+            skillType: 2,
+            statusType: 3,
+            aiScores: [90],
+            totalCount: 1,
+          ),
+        );
         // Speaking (4)
-        await _studentService.submitStudentProgressWS(GeneralStudentSubmitWsDto(
-          levelType: l, skillType: 4, statusType: 3, aiScores: [90], totalCount: 1,
-        ));
+        await _studentService.submitStudentProgressWS(
+          GeneralStudentSubmitWsDto(
+            levelType: l,
+            skillType: 4,
+            statusType: 3,
+            aiScores: [90],
+            totalCount: 1,
+          ),
+        );
       }
 
       // 4. Enrollments sadece hedeflenen levele
-      await _studentService.postUserSkillEnrollment(PostUserSkillEnrollmentDto(skillType: 1, levelType: levelInt));
-      await _studentService.postUserSkillEnrollment(PostUserSkillEnrollmentDto(skillType: 2, levelType: levelInt));
-      await _studentService.postUserSkillEnrollment(PostUserSkillEnrollmentDto(skillType: 3, levelType: levelInt));
-      await _studentService.postUserSkillEnrollment(PostUserSkillEnrollmentDto(skillType: 4, levelType: levelInt));
+      await _studentService.postUserSkillEnrollment(
+        PostUserSkillEnrollmentDto(skillType: 1, levelType: levelInt),
+      );
+      await _studentService.postUserSkillEnrollment(
+        PostUserSkillEnrollmentDto(skillType: 2, levelType: levelInt),
+      );
+      await _studentService.postUserSkillEnrollment(
+        PostUserSkillEnrollmentDto(skillType: 3, levelType: levelInt),
+      );
+      await _studentService.postUserSkillEnrollment(
+        PostUserSkillEnrollmentDto(skillType: 4, levelType: levelInt),
+      );
 
       state = state.copyWith(
         determinedLevel: levelStr,
@@ -213,7 +278,10 @@ class PlacementNotifier extends StateNotifier<PlacementState> {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(error: 'Sonuçlar kaydedilirken hata oluştu: $e', isLoading: false);
+      state = state.copyWith(
+        error: 'Sonuçlar kaydedilirken hata oluştu: $e',
+        isLoading: false,
+      );
     }
   }
 }

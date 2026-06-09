@@ -4,6 +4,8 @@ import 'package:flutter_turkce_ogrenme_application/data/enum/register_enum.dart'
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/register/register_provider.dart';
+import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
+import 'package:flutter_turkce_ogrenme_application/features/placement/placement_test_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/main.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -549,26 +551,42 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
 
                           switch (result) {
                             case RegisterEnumResult.success:
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text(
-                                    "Kayıt başarılı! Giriş yapabilirsiniz.",
-                                  ),
-                                  backgroundColor: Colors.green,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              );
-                              ref
-                                  .read(registerProvider.notifier)
-                                  .registerClear();
-                              ref
+                              // Otomatik login yap ve placement test'e yönlendir
+                              final loginResult = await ref
                                   .read(loginProvider.notifier)
-                                  .loginClear();
-                              // RegisterScreen'i kapat, mevcut LoginScreen'e dön
-                              Navigator.pop(context);
+                                  .login(
+                                    email: emailController.text,
+                                    password: passwordController.text,
+                                  );
+                              if (!context.mounted) return;
+                              if (loginResult.name == 'success') {
+                                await ref
+                                    .read(userProvider.notifier)
+                                    .logUser();
+                                if (!context.mounted) return;
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const PlacementTestScreen(),
+                                  ),
+                                  (route) => false,
+                                );
+                              } else {
+                                // Login başarısız — login ekranına yönlendir
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                      "Kayıt başarılı! Lütfen giriş yapın.",
+                                    ),
+                                    backgroundColor: Colors.green,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                );
+                                Navigator.pop(context);
+                              }
                               break;
 
                             case RegisterEnumResult.emailTaken:

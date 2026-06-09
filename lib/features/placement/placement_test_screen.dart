@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_turkce_ogrenme_application/features/placement/placement_notifier.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:flutter_turkce_ogrenme_application/features/home/home_screen.dart';
@@ -11,7 +12,8 @@ class PlacementTestScreen extends ConsumerStatefulWidget {
   const PlacementTestScreen({super.key});
 
   @override
-  ConsumerState<PlacementTestScreen> createState() => _PlacementTestScreenState();
+  ConsumerState<PlacementTestScreen> createState() =>
+      _PlacementTestScreenState();
 }
 
 class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
@@ -53,7 +55,10 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Seviye Belirleme Sınavı", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: const Text(
+          "Seviye Belirleme Sınavı",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
@@ -65,7 +70,11 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
     );
   }
 
-  Widget _buildContent(PlacementState state, PlacementNotifier notifier, Color primaryColor) {
+  Widget _buildContent(
+    PlacementState state,
+    PlacementNotifier notifier,
+    Color primaryColor,
+  ) {
     if (state.error != null) {
       return Center(
         child: Column(
@@ -73,9 +82,9 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
           children: [
             Text(state.error!, style: const TextStyle(color: Colors.red)),
             ElevatedButton(
-              onPressed: () => notifier.nextStep(), 
+              onPressed: () => notifier.nextStep(),
               child: const Text('Tekrar Dene'),
-            )
+            ),
           ],
         ),
       );
@@ -90,15 +99,23 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
             children: [
               const Icon(Icons.stars_rounded, size: 80, color: Colors.amber),
               const SizedBox(height: 20),
-              const Text("Sınav Tamamlandı!", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text(
+                "Sınav Tamamlandı!",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 10),
-              Text("Belirlenen Seviyeniz: ${state.determinedLevel}", style: const TextStyle(fontSize: 20, color: Colors.blue)),
+              Text(
+                "Belirlenen Seviyeniz: ${state.determinedLevel}",
+                style: const TextStyle(fontSize: 20, color: Colors.blue),
+              ),
               const SizedBox(height: 40),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: () {
                   Navigator.pushReplacement(
@@ -106,8 +123,11 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
                     MaterialPageRoute(builder: (context) => const HomeScreen()),
                   );
                 },
-                child: const Text("Öğrenmeye Başla", style: TextStyle(color: Colors.white, fontSize: 16)),
-              )
+                child: const Text(
+                  "Öğrenmeye Başla",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
             ],
           ),
         ),
@@ -159,28 +179,49 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
     return current / total;
   }
 
-  Widget _buildCurrentQuestion(PlacementState state, PlacementNotifier notifier, Color primaryColor) {
-    if (state.currentStep == PlacementStep.reading && state.currentReading != null) {
+  Widget _buildCurrentQuestion(
+    PlacementState state,
+    PlacementNotifier notifier,
+    Color primaryColor,
+  ) {
+    if (state.currentStep == PlacementStep.reading &&
+        state.currentReading != null) {
       final qData = state.currentReading!;
       final qIndex = state.currentQuestionIndex - 1;
-      final q = (qIndex >= 0 && qIndex < qData.questions.length) ? qData.questions[qIndex] : null;
+      final q = (qIndex >= 0 && qIndex < qData.questions.length)
+          ? qData.questions[qIndex]
+          : null;
 
       if (q == null) return const SizedBox.shrink();
 
       return ListView(
         children: [
-          const Text("Okuma Bölümü", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+          const Text(
+            "Okuma Bölümü",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Text(qData.paragraph, style: const TextStyle(fontSize: 16)),
           ),
           const SizedBox(height: 20),
-          Text(q.text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          Text(
+            q.text,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 20),
           ...q.options.map((opt) {
-            final isSelected = state.readingAnswers[state.currentQuestionIndex] == opt;
+            final isSelected =
+                state.readingAnswers[state.currentQuestionIndex] == opt;
             return Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
               child: InkWell(
@@ -188,9 +229,14 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    border: Border.all(color: isSelected ? primaryColor : Colors.grey.shade300, width: 2),
+                    border: Border.all(
+                      color: isSelected ? primaryColor : Colors.grey.shade300,
+                      width: 2,
+                    ),
                     borderRadius: BorderRadius.circular(12),
-                    color: isSelected ? primaryColor.withOpacity(0.1) : Colors.white,
+                    color: isSelected
+                        ? primaryColor.withOpacity(0.1)
+                        : Colors.white,
                   ),
                   child: Text(opt),
                 ),
@@ -198,40 +244,68 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
             );
           }),
           const SizedBox(height: 20),
-          _buildNextButton(state, notifier, primaryColor, state.readingAnswers.containsKey(state.currentQuestionIndex)),
+          _buildNextButton(
+            state,
+            notifier,
+            primaryColor,
+            state.readingAnswers.containsKey(state.currentQuestionIndex),
+          ),
         ],
       );
-    } 
-    
-    else if (state.currentStep == PlacementStep.listening && state.currentListening != null) {
+    } else if (state.currentStep == PlacementStep.listening &&
+        state.currentListening != null) {
       final qData = state.currentListening!;
       final qIndex = state.currentQuestionIndex - 1;
-      final q = (qIndex >= 0 && qIndex < qData.questions.length) ? qData.questions[qIndex] : null;
+      final q = (qIndex >= 0 && qIndex < qData.questions.length)
+          ? qData.questions[qIndex]
+          : null;
 
       if (q == null) return const SizedBox.shrink();
 
       return ListView(
         children: [
-          const Text("Dinleme Bölümü", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+          const Text(
+            "Dinleme Bölümü",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: const Row(
               children: [
                 Icon(Icons.headset, color: Colors.blue),
                 SizedBox(width: 10),
-                Expanded(child: Text("Sınav ortamında metin okunur. Test amaçlı metni gösteriyoruz:", style: TextStyle(color: Colors.grey))),
+                Expanded(
+                  child: Text(
+                    "Sınav ortamında metin okunur. Test amaçlı metni gösteriyoruz:",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 10),
-          Text(qData.paragraph, style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic)),
+          Text(
+            qData.paragraph,
+            style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+          ),
           const SizedBox(height: 20),
-          Text(q.text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          Text(
+            q.text,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 20),
           ...q.options.map((opt) {
-            final isSelected = state.listeningAnswers[state.currentQuestionIndex] == opt;
+            final isSelected =
+                state.listeningAnswers[state.currentQuestionIndex] == opt;
             return Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
               child: InkWell(
@@ -239,9 +313,14 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    border: Border.all(color: isSelected ? primaryColor : Colors.grey.shade300, width: 2),
+                    border: Border.all(
+                      color: isSelected ? primaryColor : Colors.grey.shade300,
+                      width: 2,
+                    ),
                     borderRadius: BorderRadius.circular(12),
-                    color: isSelected ? primaryColor.withOpacity(0.1) : Colors.white,
+                    color: isSelected
+                        ? primaryColor.withOpacity(0.1)
+                        : Colors.white,
                   ),
                   child: Text(opt),
                 ),
@@ -249,18 +328,32 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
             );
           }),
           const SizedBox(height: 20),
-          _buildNextButton(state, notifier, primaryColor, state.listeningAnswers.containsKey(state.currentQuestionIndex)),
+          _buildNextButton(
+            state,
+            notifier,
+            primaryColor,
+            state.listeningAnswers.containsKey(state.currentQuestionIndex),
+          ),
         ],
       );
-    }
-    
-    else if (state.currentStep == PlacementStep.writing && state.currentWriting != null) {
+    } else if (state.currentStep == PlacementStep.writing &&
+        state.currentWriting != null) {
       final q = state.currentWriting!;
       return ListView(
         children: [
-          const Text("Yazma Bölümü", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+          const Text(
+            "Yazma Bölümü",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
           const SizedBox(height: 10),
-          Text(q.topic, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          Text(
+            q.title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 10),
           Text(q.instructions, style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 20),
@@ -269,7 +362,9 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
             maxLines: 8,
             decoration: InputDecoration(
               hintText: "Cevabınızı buraya yazın...",
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -277,26 +372,40 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
               minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             onPressed: () {
               if (_writingController.text.trim().isNotEmpty) {
                 notifier.submitWriting(_writingController.text);
               }
             },
-            child: const Text("Gönder", style: TextStyle(color: Colors.white, fontSize: 16)),
-          )
+            child: const Text(
+              "Gönder",
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ),
         ],
       );
-    }
-
-    else if (state.currentStep == PlacementStep.speaking && state.currentSpeaking != null) {
+    } else if (state.currentStep == PlacementStep.speaking &&
+        state.currentSpeaking != null) {
       final q = state.currentSpeaking!;
       return ListView(
         children: [
-          const Text("Konuşma Bölümü", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+          const Text(
+            "Konuşma Bölümü",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
           const SizedBox(height: 10),
-          Text(q.topic, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          Text(
+            q.title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 10),
           Text(q.instructions, style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 40),
@@ -310,23 +419,36 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
                   color: _isRecording ? Colors.red : primaryColor,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(_isRecording ? Icons.stop : Icons.mic, color: Colors.white, size: 50),
+                child: Icon(
+                  _isRecording ? Icons.stop : Icons.mic,
+                  color: Colors.white,
+                  size: 50,
+                ),
               ),
             ),
           ),
           const SizedBox(height: 20),
-          Center(child: Text(_isRecording ? "Kaydediliyor..." : "Kaydetmek için dokunun")),
+          Center(
+            child: Text(
+              _isRecording ? "Kaydediliyor..." : "Kaydetmek için dokunun",
+            ),
+          ),
           const SizedBox(height: 40),
           if (_audioPath != null && !_isRecording)
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: () => notifier.submitSpeaking(_audioPath!),
-              child: const Text("Gönder", style: TextStyle(color: Colors.white, fontSize: 16)),
-            )
+              child: const Text(
+                "Gönder",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
         ],
       );
     }
@@ -334,7 +456,12 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
     return const SizedBox.shrink();
   }
 
-  Widget _buildNextButton(PlacementState state, PlacementNotifier notifier, Color primaryColor, bool isEnabled) {
+  Widget _buildNextButton(
+    PlacementState state,
+    PlacementNotifier notifier,
+    Color primaryColor,
+    bool isEnabled,
+  ) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: isEnabled ? primaryColor : Colors.grey.shade300,
@@ -342,7 +469,10 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       onPressed: isEnabled ? () => notifier.nextStep() : null,
-      child: const Text("Sonraki Soru", style: TextStyle(color: Colors.white, fontSize: 16)),
+      child: const Text(
+        "Sonraki Soru",
+        style: TextStyle(color: Colors.white, fontSize: 16),
+      ),
     );
   }
 }

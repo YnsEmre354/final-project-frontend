@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/login_enum.dart';
+import 'package:flutter_turkce_ogrenme_application/data/services/student_service.dart';
 import 'package:flutter_turkce_ogrenme_application/features/admin/presentation/admin_login_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/register/register_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/home/home_screen.dart';
+import 'package:flutter_turkce_ogrenme_application/features/placement/placement_test_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/main.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -184,10 +186,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                             await ref.read(userProvider.notifier).logUser();
                             _resetControllers();
                             if (!context.mounted) return;
+                            // Yeni kullanıcı mı kontrol et
+                            final enrollments = await StudentService().getUserEnrollment();
+                            if (!context.mounted) return;
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HomeScreen(),
+                                builder: (context) => enrollments.isEmpty
+                                    ? const PlacementTestScreen()
+                                    : const HomeScreen(),
                               ),
                               (route) => false,
                             );

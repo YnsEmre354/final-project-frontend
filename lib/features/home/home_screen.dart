@@ -569,7 +569,7 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
           mainAxisSpacing: 10,
           childAspectRatio: 1.0,
           children: topics
-              .map((t) => _topicCard(t, color, lightColor, borderColor, label))
+              .map((t) => _topicCard(t, color, lightColor, borderColor, label, levelType))
               .toList(),
         ),
         if (!sectionLocked && levelType < 6) ...[
@@ -608,6 +608,7 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
     Color lightColor,
     Color borderColor,
     String level,
+    int levelType,
   ) {
     return Container(
       decoration: BoxDecoration(
@@ -649,9 +650,11 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                   }
 
                   if (topic.completed) {
+                    // Zaten başarıyla tamamlanmış — yeniden çözme onayı
                     final bool? proceed = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         title: const Text("Görevi Yeniden Çöz"),
                         content: const Text("Bu görevi zaten başarıyla tamamladınız. Yeniden çözmek yeni sorularla pratik yapmanızı sağlar ancak önceki ilerlemeniz etkilenebilir. Devam etmek istiyor musunuz?"),
                         actions: [
@@ -662,6 +665,97 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                           ElevatedButton(
                             onPressed: () => Navigator.pop(context, true),
                             child: const Text("Yeniden Çöz"),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (proceed != true) return;
+                  } else if (!topic.locked) {
+                    // Henüz tamamlanmamış (kırmızı) — önceki notu göster ve baştan başlatma onayı
+                    final double prevProgress = _getTopicProgress(levelType, topic.title);
+                    final int prevPercent = (prevProgress * 100).round();
+                    final bool hasPrevAttempt = prevPercent > 0;
+
+                    final bool? proceed = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: Row(
+                          children: [
+                            const Text("🔄 ", style: TextStyle(fontSize: 20)),
+                            Expanded(
+                              child: Text(
+                                "${topic.title} Sınavı",
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                              ),
+                            ),
+                          ],
+                        ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (hasPrevAttempt) ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFF7ED),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: const Color(0xFFFED7AA)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Text("📊", style: TextStyle(fontSize: 18)),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            "Önceki Notunuz",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFFC2410C),
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          Text(
+                                            "%$prevPercent",
+                                            style: const TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w900,
+                                              color: Color(0xFFEA580C),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                            ],
+                            const Text(
+                              "Sınavı en baştan çözmeye başlayacaksınız. Başarılı olursanız bu görev tamamlanmış olarak işaretlenecektir.",
+                              style: TextStyle(color: Color(0xFF64748B), height: 1.5),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text("İptal"),
+                          ),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1D4ED8),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onPressed: () => Navigator.pop(context, true),
+                            icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                            label: const Text("Baştan Başla"),
                           ),
                         ],
                       ),
