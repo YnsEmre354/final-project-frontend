@@ -235,7 +235,7 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
                     ),
                     borderRadius: BorderRadius.circular(12),
                     color: isSelected
-                        ? primaryColor.withOpacity(0.1)
+                        ? primaryColor.withValues(alpha: 0.1)
                         : Colors.white,
                   ),
                   child: Text(opt),
@@ -319,7 +319,7 @@ class _PlacementTestScreenState extends ConsumerState<PlacementTestScreen> {
                     ),
                     borderRadius: BorderRadius.circular(12),
                     color: isSelected
-                        ? primaryColor.withOpacity(0.1)
+                        ? primaryColor.withValues(alpha: 0.1)
                         : Colors.white,
                   ),
                   child: Text(opt),

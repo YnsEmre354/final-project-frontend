@@ -1,1 +1,1 @@
-enum RegisterEnumResult { success, usernameTaken, emailTaken, error }
+enum RegisterEnumResult { success, usernameTaken, emailTaken, error, emailVerificationSent }

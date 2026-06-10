@@ -13,7 +13,7 @@ class ApiService {
     _dio = Dio(
       BaseOptions(
         baseUrl:
-            'https://10.0.2.2:7260/api', // 'https://192.168.1.70:7260/api',
+            'http://10.0.2.2:5260/api', // 'https://192.168.1.70:7260/api',
         connectTimeout: const Duration(seconds: 100),
         receiveTimeout: const Duration(seconds: 300),
         headers: {'Content-type': 'application/json'},

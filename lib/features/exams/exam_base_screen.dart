@@ -335,7 +335,7 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -409,8 +409,8 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
                   color: isActive
                       ? Colors.white
                       : isVisited
-                      ? Colors.white.withOpacity(0.5)
-                      : Colors.white.withOpacity(0.2),
+                      ? Colors.white.withValues(alpha: 0.5)
+                      : Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors.white,
@@ -664,10 +664,10 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF7B1FA2).withOpacity(0.08),
+                    color: const Color(0xFF7B1FA2).withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: const Color(0xFF7B1FA2).withOpacity(0.3),
+                      color: const Color(0xFF7B1FA2).withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(
@@ -776,7 +776,9 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: (_ttsPlaying ? _accent : _primary).withOpacity(0.38),
+                    color: (_ttsPlaying ? _accent : _primary).withValues(
+                      alpha: 0.38,
+                    ),
                     blurRadius: 22,
                     offset: const Offset(0, 8),
                   ),
@@ -822,7 +824,7 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
                   builder: (ctx, val, _) => LinearProgressIndicator(
                     value: val,
                     minHeight: 7,
-                    backgroundColor: _primary.withOpacity(0.12),
+                    backgroundColor: _primary.withValues(alpha: 0.12),
                     valueColor: const AlwaysStoppedAnimation<Color>(_primary),
                   ),
                 ),
@@ -945,7 +947,9 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
               maxLines: 8,
               decoration: InputDecoration(
                 hintText: 'Cevabınızı buraya yazın…',
-                hintStyle: TextStyle(color: _textSecondary.withOpacity(0.6)),
+                hintStyle: TextStyle(
+                  color: _textSecondary.withValues(alpha: 0.6),
+                ),
                 border: InputBorder.none,
               ),
               style: const TextStyle(color: _textPrimary, fontSize: 15),
@@ -1063,7 +1067,7 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: _success.withOpacity(0.1),
+                  color: _success.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -1173,9 +1177,9 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.05),
+            color: color.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.2)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
           ),
           child: Text(
             content,
@@ -1246,7 +1250,7 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
                   boxShadow: [
                     BoxShadow(
                       color: (_isRecording ? Colors.red : speakingPurple)
-                          .withOpacity(0.4),
+                          .withValues(alpha: 0.4),
                       blurRadius: _isRecording ? 28 : 16,
                       spreadRadius: _isRecording ? 4 : 0,
                     ),
@@ -1396,7 +1400,7 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
 
           if (_answered) {
             if (opt[0] == correct) {
-              cardColor = _success.withOpacity(0.08);
+              cardColor = _success.withValues(alpha: 0.08);
               borderColor = _success;
               labelColor = _success;
               trailingIcon = const Icon(
@@ -1405,13 +1409,13 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
                 size: 20,
               );
             } else if (opt == _selectedAnswer) {
-              cardColor = _error.withOpacity(0.08);
+              cardColor = _error.withValues(alpha: 0.08);
               borderColor = _error;
               labelColor = _error;
               trailingIcon = const Icon(Icons.cancel, color: _error, size: 20);
             }
           } else if (opt == _selectedAnswer) {
-            cardColor = _primary.withOpacity(0.07);
+            cardColor = _primary.withValues(alpha: 0.07);
             borderColor = _primary;
           }
 
@@ -1429,7 +1433,7 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
                 border: Border.all(color: borderColor, width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -1441,7 +1445,7 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
-                      color: labelColor.withOpacity(0.15),
+                      color: labelColor.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -1462,7 +1466,7 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
                       style: const TextStyle(color: _textPrimary, fontSize: 14),
                     ),
                   ),
-                  if (trailingIcon != null) trailingIcon,
+                  ?trailingIcon,
                 ],
               ),
             ),
@@ -1563,7 +1567,7 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
         color: _cardBg,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, -4),
           ),
@@ -1682,7 +1686,7 @@ class _ExamBaseScreenState extends ConsumerState<ExamBaseScreen>
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

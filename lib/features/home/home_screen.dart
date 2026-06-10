@@ -35,7 +35,7 @@ bu b1 b2 isimleri de backend den gelebilir db ile onlar yapılsın backend de de
 class _ConsumerScreenState extends ConsumerState<HomeScreen> {
   late String username;
   late String userLogin;
-  Map<int, Map<String, dynamic>> _levelProgressMap = {};
+  final Map<int, Map<String, dynamic>> _levelProgressMap = {};
   List<UserSkillEnrollmentDto> _enrollments = [];
   bool _isLoadingProgress = true;
   final StudentService _studentService = StudentService();
@@ -77,35 +77,38 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
     try {
       final res = await _studentService.unlockNextLevelEnrollment(dto);
       if (res) {
-         await _fetchProgress();
-         if (notificationsEnabled) {
-           await LocalNotificationService.show(
-             id: 1001,
-             title: '🎉 Seviye Kilidi Açıldı!',
-             body: '$levelName seviyesi artık kullanımınıza açıktır. İyi çalışmalar!',
-           );
-         }
+        await _fetchProgress();
+        if (notificationsEnabled) {
+          await LocalNotificationService.show(
+            id: 1001,
+            title: '🎉 Seviye Kilidi Açıldı!',
+            body:
+                '$levelName seviyesi artık kullanımınıza açıktır. İyi çalışmalar!',
+          );
+        }
       } else {
-         if (mounted && notificationsEnabled) {
-           await LocalNotificationService.show(
-             id: 1002,
-             title: 'Seviye Kilidi Açılamadı',
-             body: 'Mevcut seviyenin tüm derslerini tamamlayın.',
-           );
-         }
+        if (mounted && notificationsEnabled) {
+          await LocalNotificationService.show(
+            id: 1002,
+            title: 'Seviye Kilidi Açılamadı',
+            body: 'Mevcut seviyenin tüm derslerini tamamlayın.',
+          );
+        }
       }
     } catch (e) {
-       if (mounted) {
-         // Hata bildirimleri her zaman gösterilir
-         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-             content: Text(e.toString().replaceAll('Exception: ', '')),
-             backgroundColor: Colors.orange.shade800,
-             behavior: SnackBarBehavior.floating,
-             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-           ),
-         );
-       }
+      if (mounted) {
+        // Hata bildirimleri her zaman gösterilir
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.orange.shade800,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -124,25 +127,25 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
 
   double _getTopicProgress(int levelType, String topicTitle) {
     if (_levelProgressMap.containsKey(levelType)) {
-       final map = _levelProgressMap[levelType]!;
-       String keyLower = topicTitle.toLowerCase();
-       String keyCap = topicTitle;
-       int skillId = 1;
-       if (keyLower == 'reading') {
-         skillId = 1;
-       } else if (keyLower == 'writing') {
-         skillId = 2;
-       } else if (keyLower == 'listening') {
-         skillId = 3;
-       } else if (keyLower == 'speaking') {
-         skillId = 4;
-       }
+      final map = _levelProgressMap[levelType]!;
+      String keyLower = topicTitle.toLowerCase();
+      String keyCap = topicTitle;
+      int skillId = 1;
+      if (keyLower == 'reading') {
+        skillId = 1;
+      } else if (keyLower == 'writing') {
+        skillId = 2;
+      } else if (keyLower == 'listening') {
+        skillId = 3;
+      } else if (keyLower == 'speaking') {
+        skillId = 4;
+      }
 
-       dynamic val = map[keyLower] ?? map[keyCap] ?? map[skillId.toString()];
-       if (val != null) {
-          if (val is num) return (val.toDouble() / 100.0).clamp(0.0, 1.0);
-          if (val is String) return (double.tryParse(val) ?? 0.0) / 100.0;
-       }
+      dynamic val = map[keyLower] ?? map[keyCap] ?? map[skillId.toString()];
+      if (val != null) {
+        if (val is num) return (val.toDouble() / 100.0).clamp(0.0, 1.0);
+        if (val is String) return (double.tryParse(val) ?? 0.0) / 100.0;
+      }
     }
     return 0.0;
   }
@@ -151,7 +154,8 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
     UserSkillEnrollmentDto? getEnrollment(int skillId) {
       try {
         return _enrollments.firstWhere(
-            (e) => e.levelType == levelType && e.skillType == skillId);
+          (e) => e.levelType == levelType && e.skillType == skillId,
+        );
       } catch (e) {
         return null;
       }
@@ -163,10 +167,34 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
     final speakEnr = getEnrollment(4);
 
     return [
-      _TopicData("Writing", "✍️", progress: _getTopicProgress(levelType, "Writing"), locked: writeEnr?.isLocked ?? true, attempted: writeEnr?.isAttempted ?? false),
-      _TopicData("Listening", "🎧", progress: _getTopicProgress(levelType, "Listening"), locked: listenEnr?.isLocked ?? true, attempted: listenEnr?.isAttempted ?? false),
-      _TopicData("Reading", "📚", progress: _getTopicProgress(levelType, "Reading"), locked: readEnr?.isLocked ?? true, attempted: readEnr?.isAttempted ?? false),
-      _TopicData("Speaking", "🗣️", progress: _getTopicProgress(levelType, "Speaking"), locked: speakEnr?.isLocked ?? true, attempted: speakEnr?.isAttempted ?? false),
+      _TopicData(
+        "Writing",
+        "✍️",
+        progress: _getTopicProgress(levelType, "Writing"),
+        locked: writeEnr?.isLocked ?? true,
+        attempted: writeEnr?.isAttempted ?? false,
+      ),
+      _TopicData(
+        "Listening",
+        "🎧",
+        progress: _getTopicProgress(levelType, "Listening"),
+        locked: listenEnr?.isLocked ?? true,
+        attempted: listenEnr?.isAttempted ?? false,
+      ),
+      _TopicData(
+        "Reading",
+        "📚",
+        progress: _getTopicProgress(levelType, "Reading"),
+        locked: readEnr?.isLocked ?? true,
+        attempted: readEnr?.isAttempted ?? false,
+      ),
+      _TopicData(
+        "Speaking",
+        "🗣️",
+        progress: _getTopicProgress(levelType, "Speaking"),
+        locked: speakEnr?.isLocked ?? true,
+        attempted: speakEnr?.isAttempted ?? false,
+      ),
     ];
   }
 
@@ -179,19 +207,26 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           children: [
             UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(
-                color: Color(0xFF1D4ED8),
-              ),
+              decoration: const BoxDecoration(color: Color(0xFF1D4ED8)),
               currentAccountPicture: const CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(Icons.person, color: Color(0xFF1D4ED8), size: 40),
               ),
-              accountName: Text(username, style: const TextStyle(fontWeight: FontWeight.bold)),
+              accountName: Text(
+                username,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               accountEmail: Text("@$userLogin"),
             ),
             ListTile(
               leading: const Icon(Icons.leaderboard, color: Color(0xFF1E293B)),
-              title: const Text('Skor Tablosu', style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.w600)),
+              title: const Text(
+                'Skor Tablosu',
+                style: TextStyle(
+                  color: Color(0xFF1E293B),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               onTap: () {
                 Navigator.pop(context); // close drawer
                 Navigator.push(
@@ -204,7 +239,13 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.settings, color: Color(0xFF1E293B)),
-              title: const Text('Ayarlar', style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.w600)),
+              title: const Text(
+                'Ayarlar',
+                style: TextStyle(
+                  color: Color(0xFF1E293B),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               onTap: () {
                 Navigator.pop(context); // close drawer
                 Navigator.push(
@@ -332,12 +373,14 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
       totalCompleted += unlockedTopics.where((t) => t.completed).length;
     }
 
-    final double progressFraction =
-        totalLessons > 0 ? (totalCompleted / totalLessons).clamp(0.0, 1.0) : 0.0;
+    final double progressFraction = totalLessons > 0
+        ? (totalCompleted / totalLessons).clamp(0.0, 1.0)
+        : 0.0;
     final int progressPercent = (progressFraction * 100).round();
     // Progress bar için 5 segment
-    final int filledSegments =
-        totalLessons > 0 ? (progressFraction * 5).round() : 0;
+    final int filledSegments = totalLessons > 0
+        ? (progressFraction * 5).round()
+        : 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -349,7 +392,7 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2563EB).withOpacity(0.25),
+            color: const Color(0xFF2563EB).withValues(alpha: 0.25),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -362,7 +405,7 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Center(
@@ -393,7 +436,7 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                         decoration: BoxDecoration(
                           color: i < filledSegments
                               ? Colors.white
-                              : Colors.white.withOpacity(0.25),
+                              : Colors.white.withValues(alpha: 0.25),
                           borderRadius: BorderRadius.circular(99),
                         ),
                       ),
@@ -468,7 +511,7 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                 ? []
                 : [
                     BoxShadow(
-                      color: color.withOpacity(0.08),
+                      color: color.withValues(alpha: 0.08),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -569,7 +612,16 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
           mainAxisSpacing: 10,
           childAspectRatio: 1.0,
           children: topics
-              .map((t) => _topicCard(t, color, lightColor, borderColor, label, levelType))
+              .map(
+                (t) => _topicCard(
+                  t,
+                  color,
+                  lightColor,
+                  borderColor,
+                  label,
+                  levelType,
+                ),
+              )
               .toList(),
         ),
         if (!sectionLocked && levelType < 6) ...[
@@ -581,7 +633,9 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                 if (completedCount < topics.length) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text("Sonraki seviyeye geçmek için tüm görevleri tamamlamalısınız!"),
+                      content: Text(
+                        "Sonraki seviyeye geçmek için tüm görevleri tamamlamalısınız!",
+                      ),
                       backgroundColor: Colors.orange,
                     ),
                   );
@@ -591,13 +645,21 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: color,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: const Text("Sonraki Seviyenin Kilidini Aç", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: const Text(
+                "Sonraki Seviyenin Kilidini Aç",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
-        ]
+        ],
       ],
     );
   }
@@ -619,7 +681,7 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
               ? const Color(0xFFE2E8F0)
               : topic.completed
               ? borderColor
-              : Colors.red.withOpacity(0.5),
+              : Colors.red.withValues(alpha: 0.5),
           width: 1.5,
         ),
         boxShadow: topic.locked
@@ -654,9 +716,13 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                     final bool? proceed = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                         title: const Text("Görevi Yeniden Çöz"),
-                        content: const Text("Bu görevi zaten başarıyla tamamladınız. Yeniden çözmek yeni sorularla pratik yapmanızı sağlar ancak önceki ilerlemeniz etkilenebilir. Devam etmek istiyor musunuz?"),
+                        content: const Text(
+                          "Bu görevi zaten başarıyla tamamladınız. Yeniden çözmek yeni sorularla pratik yapmanızı sağlar ancak önceki ilerlemeniz etkilenebilir. Devam etmek istiyor musunuz?",
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
@@ -673,21 +739,29 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                     if (proceed != true) return;
                   } else if (!topic.locked) {
                     // Henüz tamamlanmamış (kırmızı) — önceki notu göster ve baştan başlatma onayı
-                    final double prevProgress = _getTopicProgress(levelType, topic.title);
+                    final double prevProgress = _getTopicProgress(
+                      levelType,
+                      topic.title,
+                    );
                     final int prevPercent = (prevProgress * 100).round();
                     final bool hasPrevAttempt = prevPercent > 0;
 
                     final bool? proceed = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                         title: Row(
                           children: [
                             const Text("🔄 ", style: TextStyle(fontSize: 20)),
                             Expanded(
                               child: Text(
                                 "${topic.title} Sınavı",
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17,
+                                ),
                               ),
                             ),
                           ],
@@ -698,19 +772,28 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                           children: [
                             if (hasPrevAttempt) ...[
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 10,
+                                ),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFFF7ED),
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: const Color(0xFFFED7AA)),
+                                  border: Border.all(
+                                    color: const Color(0xFFFED7AA),
+                                  ),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Text("📊", style: TextStyle(fontSize: 18)),
+                                    const Text(
+                                      "📊",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           const Text(
                                             "Önceki Notunuz",
@@ -738,7 +821,10 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                             ],
                             const Text(
                               "Sınavı en baştan çözmeye başlayacaksınız. Başarılı olursanız bu görev tamamlanmış olarak işaretlenecektir.",
-                              style: TextStyle(color: Color(0xFF64748B), height: 1.5),
+                              style: TextStyle(
+                                color: Color(0xFF64748B),
+                                height: 1.5,
+                              ),
                             ),
                           ],
                         ),
@@ -751,10 +837,15 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF1D4ED8),
                               foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                             onPressed: () => Navigator.pop(context, true),
-                            icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                            icon: const Icon(
+                              Icons.play_arrow_rounded,
+                              size: 18,
+                            ),
                             label: const Text("Baştan Başla"),
                           ),
                         ],
@@ -776,7 +867,7 @@ class _ConsumerScreenState extends ConsumerState<HomeScreen> {
                   });
                 },
           borderRadius: BorderRadius.circular(18),
-          splashColor: color.withOpacity(0.08),
+          splashColor: color.withValues(alpha: 0.08),
           highlightColor: lightColor,
           child: Opacity(
             opacity: topic.locked ? 0.5 : 1.0,

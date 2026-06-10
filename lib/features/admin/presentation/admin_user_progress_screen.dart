@@ -14,10 +14,12 @@ class AdminUserProgressScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<AdminUserProgressScreen> createState() => _AdminUserProgressScreenState();
+  ConsumerState<AdminUserProgressScreen> createState() =>
+      _AdminUserProgressScreenState();
 }
 
-class _AdminUserProgressScreenState extends ConsumerState<AdminUserProgressScreen> {
+class _AdminUserProgressScreenState
+    extends ConsumerState<AdminUserProgressScreen> {
   @override
   void initState() {
     super.initState();
@@ -71,7 +73,11 @@ class _AdminUserProgressScreenState extends ConsumerState<AdminUserProgressScree
       appBar: AppBar(
         title: Text(
           "${widget.userName} - İlerleme",
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 18,
+          ),
         ),
         backgroundColor: duoBlue,
         elevation: 0,
@@ -81,37 +87,39 @@ class _AdminUserProgressScreenState extends ConsumerState<AdminUserProgressScree
       body: adminState.isProgressLoading
           ? const Center(child: CircularProgressIndicator())
           : adminState.error != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text(
-                      adminState.error!,
-                      style: const TextStyle(color: Colors.red, fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                )
-              : adminState.selectedUserProgress.isEmpty
-                  ? const Center(
-                      child: Text(
-                        "Bu kullanıcı için henüz ilerleme verisi bulunmuyor.",
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: () async {
-                        await ref.read(adminProvider.notifier).fetchUserProgress(widget.userId);
-                      },
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: adminState.selectedUserProgress.length,
-                        itemBuilder: (context, index) {
-                          final progress = adminState.selectedUserProgress[index];
-                          return _buildProgressCard(progress);
-                        },
-                      ),
-                    ),
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  adminState.error!,
+                  style: const TextStyle(color: Colors.red, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
+          : adminState.selectedUserProgress.isEmpty
+          ? const Center(
+              child: Text(
+                "Bu kullanıcı için henüz ilerleme verisi bulunmuyor.",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: () async {
+                await ref
+                    .read(adminProvider.notifier)
+                    .fetchUserProgress(widget.userId);
+              },
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: adminState.selectedUserProgress.length,
+                itemBuilder: (context, index) {
+                  final progress = adminState.selectedUserProgress[index];
+                  return _buildProgressCard(progress);
+                },
+              ),
+            ),
     );
   }
 
@@ -139,7 +147,10 @@ class _AdminUserProgressScreenState extends ConsumerState<AdminUserProgressScree
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.blue.shade100,
                     borderRadius: BorderRadius.circular(10),
@@ -159,9 +170,21 @@ class _AdminUserProgressScreenState extends ConsumerState<AdminUserProgressScree
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildStatColumn("Doğru", "${progress.correctAnswers}", duoGreen),
-                _buildStatColumn("Soru", "${progress.totalQuestions}", Colors.grey.shade700),
-                _buildStatColumn("Ortalama", "${progress.averageScore.toStringAsFixed(1)}", duoOrange),
+                _buildStatColumn(
+                  "Doğru",
+                  "${progress.correctAnswers}",
+                  duoGreen,
+                ),
+                _buildStatColumn(
+                  "Soru",
+                  "${progress.totalQuestions}",
+                  Colors.grey.shade700,
+                ),
+                _buildStatColumn(
+                  "Ortalama",
+                  progress.averageScore.toStringAsFixed(1),
+                  duoOrange,
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -194,10 +217,7 @@ class _AdminUserProgressScreenState extends ConsumerState<AdminUserProgressScree
               children: [
                 Text(
                   "Son Güncelleme: ${progress.lastUpdated.split('T').first}",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade500,
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                 ),
                 if (progress.isPassed)
                   const Row(
@@ -206,7 +226,11 @@ class _AdminUserProgressScreenState extends ConsumerState<AdminUserProgressScree
                       SizedBox(width: 4),
                       Text(
                         "Geçti",
-                        style: TextStyle(color: duoGreen, fontWeight: FontWeight.bold, fontSize: 12),
+                        style: TextStyle(
+                          color: duoGreen,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -232,10 +256,7 @@ class _AdminUserProgressScreenState extends ConsumerState<AdminUserProgressScree
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
-          ),
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
         ),
       ],
     );

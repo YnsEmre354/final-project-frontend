@@ -19,18 +19,17 @@ class AppNotificationBanner {
 
     late OverlayEntry entry;
     entry = OverlayEntry(
-      builder:
-          (_) => _NotificationBannerWidget(
-            title: title,
-            message: message,
-            icon: icon,
-            backgroundColor: backgroundColor,
-            duration: duration,
-            onDismiss: () {
-              entry.remove();
-              if (_currentEntry == entry) _currentEntry = null;
-            },
-          ),
+      builder: (_) => _NotificationBannerWidget(
+        title: title,
+        message: message,
+        icon: icon,
+        backgroundColor: backgroundColor,
+        duration: duration,
+        onDismiss: () {
+          entry.remove();
+          if (_currentEntry == entry) _currentEntry = null;
+        },
+      ),
     );
 
     _currentEntry = entry;
@@ -129,7 +128,7 @@ class _NotificationBannerWidgetState extends State<_NotificationBannerWidget>
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: widget.backgroundColor.withOpacity(0.4),
+                      color: widget.backgroundColor.withValues(alpha: 0.4),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
@@ -140,7 +139,7 @@ class _NotificationBannerWidgetState extends State<_NotificationBannerWidget>
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(widget.icon, color: Colors.white, size: 24),
@@ -163,7 +162,7 @@ class _NotificationBannerWidgetState extends State<_NotificationBannerWidget>
                           Text(
                             widget.message,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                               fontSize: 13,
                             ),
                           ),
@@ -172,7 +171,7 @@ class _NotificationBannerWidgetState extends State<_NotificationBannerWidget>
                     ),
                     Icon(
                       Icons.close,
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       size: 18,
                     ),
                   ],

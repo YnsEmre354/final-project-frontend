@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/register_enum.dart';
-import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_provider.dart';
-import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_screen.dart';
+import 'package:flutter_turkce_ogrenme_application/features/auth/email_verification/email_verification_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/register/register_provider.dart';
-import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
-import 'package:flutter_turkce_ogrenme_application/features/placement/placement_test_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/main.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -99,7 +96,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: duoBlue.withOpacity(0.15),
+                      color: duoBlue.withValues(alpha: 0.15),
                       blurRadius: 20,
                       offset: const Offset(0, 6),
                     ),
@@ -151,10 +148,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: errorRed.withOpacity(0.08),
+                    color: errorRed.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: errorRed.withOpacity(0.3),
+                      color: errorRed.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -187,7 +184,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -380,7 +377,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                     ],
 
                     DropdownButtonFormField<String>(
-                      value: selectedValue,
+                      initialValue: selectedValue,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFFF7F7F7),
@@ -427,7 +424,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                     const SizedBox(height: 16),
 
                     DropdownButtonFormField<String>(
-                      value: selectedGender,
+                      initialValue: selectedGender,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFFF7F7F7),
@@ -477,7 +474,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                 decoration: BoxDecoration(
                   boxShadow: [
                     BoxShadow(
-                      color: duoBlue.withOpacity(0.4),
+                      color: duoBlue.withValues(alpha: 0.4),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -486,29 +483,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                 ),
                 child: ElevatedButton(
                   onPressed: registerState.isLoading
-                       ? null
-                       : () async {
-                           // Şifre şartı kontrolü
-                           final pw = passwordController.text;
-                           final hasMinLength = pw.length >= 8;
-                           final hasLetter = pw.contains(RegExp(r'[a-zA-Z]'));
-                           final hasDigit = pw.contains(RegExp(r'[0-9]'));
-                           if (!hasMinLength || !hasLetter || !hasDigit) {
-                             ScaffoldMessenger.of(context).showSnackBar(
-                               SnackBar(
-                                 content: const Text(
-                                   "Şifre en az 8 karakter, 1 harf ve 1 rakam içermelidir.",
-                                 ),
-                                 backgroundColor: Colors.red.shade600,
-                                 behavior: SnackBarBehavior.floating,
-                                 shape: RoundedRectangleBorder(
-                                   borderRadius: BorderRadius.circular(12),
-                                 ),
-                               ),
-                             );
-                             return;
-                           }
-                           if (selectedValue == null) {
+                      ? null
+                      : () async {
+                          // Şifre şartı kontrolü
+                          final pw = passwordController.text;
+                          final hasMinLength = pw.length >= 8;
+                          final hasLetter = pw.contains(RegExp(r'[a-zA-Z]'));
+                          final hasDigit = pw.contains(RegExp(r'[0-9]'));
+                          if (!hasMinLength || !hasLetter || !hasDigit) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text(
+                                  "Şifre en az 8 karakter, 1 harf ve 1 rakam içermelidir.",
+                                ),
+                                backgroundColor: Colors.red.shade600,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+                          if (selectedValue == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: const Text(
@@ -550,43 +547,41 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           if (!context.mounted) return;
 
                           switch (result) {
-                            case RegisterEnumResult.success:
-                              // Otomatik login yap ve placement test'e yönlendir
-                              final loginResult = await ref
-                                  .read(loginProvider.notifier)
-                                  .login(
-                                    email: emailController.text,
-                                    password: passwordController.text,
-                                  );
+                            case RegisterEnumResult.emailVerificationSent:
+                              // Navigate to email verification screen.
+                              // The pendingUserData in state carries form fields.
+                              final pending = ref
+                                  .read(registerProvider)
+                                  .pendingUserData;
                               if (!context.mounted) return;
-                              if (loginResult.name == 'success') {
-                                await ref
-                                    .read(userProvider.notifier)
-                                    .logUser();
-                                if (!context.mounted) return;
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const PlacementTestScreen(),
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => EmailVerificationScreen(
+                                    name: pending?['name'] ?? '',
+                                    surname: pending?['surname'] ?? '',
+                                    username: pending?['username'] ?? '',
+                                    nativeLanguage:
+                                        pending?['nativeLanguage'] ?? '',
+                                    gender: pending?['gender'] ?? '',
                                   ),
-                                  (route) => false,
-                                );
-                              } else {
-                                // Login başarısız — login ekranına yönlendir
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                      "Kayıt başarılı! Lütfen giriş yapın.",
-                                    ),
-                                    backgroundColor: Colors.green,
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                ),
+                                (route) => route.isFirst,
+                              );
+                              break;
+
+                            case RegisterEnumResult.success:
+                              // Legacy path (old backend register) — show success & go to login
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                    'Kayıt başarılı! Lütfen giriş yapın.',
                                   ),
-                                );
-                                Navigator.pop(context);
-                              }
+                                  backgroundColor: Colors.green,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                              Navigator.pop(context);
                               break;
 
                             case RegisterEnumResult.emailTaken:

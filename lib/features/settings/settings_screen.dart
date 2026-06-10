@@ -95,7 +95,7 @@ class _SettingScreenState extends ConsumerState<SettingsScreen>
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: _duoBlue.withOpacity(0.15),
+                          color: _duoBlue.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -119,9 +119,11 @@ class _SettingScreenState extends ConsumerState<SettingsScreen>
                       trailing: Switch(
                         value: ref.watch(notificationsProvider),
                         onChanged: (value) {
-                          ref.read(notificationsProvider.notifier).toggle(value);
+                          ref
+                              .read(notificationsProvider.notifier)
+                              .toggle(value);
                         },
-                        activeColor: _duoBlue,
+                        activeThumbColor: _duoBlue,
                       ),
                       color1: Colors.orangeAccent,
                       color2: Colors.yellowAccent,
@@ -248,7 +250,7 @@ class _SettingScreenState extends ConsumerState<SettingsScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: _duoBlue.withOpacity(0.35),
+            color: _duoBlue.withValues(alpha: 0.35),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -260,7 +262,7 @@ class _SettingScreenState extends ConsumerState<SettingsScreen>
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -291,7 +293,7 @@ class _SettingScreenState extends ConsumerState<SettingsScreen>
                 Text(
                   dto.email,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 14,
                   ),
                 ),
@@ -333,7 +335,7 @@ class _SettingScreenState extends ConsumerState<SettingsScreen>
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

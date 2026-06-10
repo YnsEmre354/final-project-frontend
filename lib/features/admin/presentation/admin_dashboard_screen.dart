@@ -8,7 +8,8 @@ class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  ConsumerState<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
+  ConsumerState<AdminDashboardScreen> createState() =>
+      _AdminDashboardScreenState();
 }
 
 class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
@@ -40,36 +41,36 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
       body: adminState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : adminState.error != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text(
-                      adminState.error!,
-                      style: const TextStyle(color: Colors.red, fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                )
-              : adminState.users.isEmpty
-                  ? const Center(
-                      child: Text(
-                        "Hiç kullanıcı bulunamadı.",
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: () async {
-                        await ref.read(adminProvider.notifier).fetchAllUsers();
-                      },
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(12),
-                        itemCount: adminState.users.length,
-                        itemBuilder: (context, index) {
-                          final user = adminState.users[index];
-                          return _buildUserCard(context, user);
-                        },
-                      ),
-                    ),
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  adminState.error!,
+                  style: const TextStyle(color: Colors.red, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
+          : adminState.users.isEmpty
+          ? const Center(
+              child: Text(
+                "Hiç kullanıcı bulunamadı.",
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: () async {
+                await ref.read(adminProvider.notifier).fetchAllUsers();
+              },
+              child: ListView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: adminState.users.length,
+                itemBuilder: (context, index) {
+                  final user = adminState.users[index];
+                  return _buildUserCard(context, user);
+                },
+              ),
+            ),
     );
   }
 
@@ -142,7 +143,9 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: user.isActive ? duoGreen.withOpacity(0.2) : duoRed.withOpacity(0.2),
+                      color: user.isActive
+                          ? duoGreen.withValues(alpha: 0.2)
+                          : duoRed.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -178,12 +181,17 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx, false),
-                              child: const Text("İptal", style: TextStyle(color: Colors.grey)),
+                              child: const Text(
+                                "İptal",
+                                style: TextStyle(color: Colors.grey),
+                              ),
                             ),
                             ElevatedButton(
                               onPressed: () => Navigator.pop(ctx, true),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: user.isActive ? duoRed : duoGreen,
+                                backgroundColor: user.isActive
+                                    ? duoRed
+                                    : duoGreen,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -216,8 +224,8 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           content: Text(
                             success
                                 ? user.isActive
-                                    ? "${user.name} pasifleştirildi."
-                                    : "${user.name} aktifleştirildi."
+                                      ? "${user.name} pasifleştirildi."
+                                      : "${user.name} aktifleştirildi."
                                 : "İşlem başarısız. Tekrar deneyin.",
                           ),
                           backgroundColor: success
@@ -236,7 +244,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                         color: user.isActive ? duoRed : duoGreen,
                         width: 1.5,
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       shape: RoundedRectangleBorder(

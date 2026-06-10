@@ -95,13 +95,15 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
           ..._skillMetas.asMap().entries.map((entry) {
             final idx = entry.key;
             final meta = entry.value;
-            final items = _scoreboardData
-                .where((s) => s.skillType == meta.skillType)
-                .toList()
-              ..sort((a, b) {
-                if (b.levelType != a.levelType) return b.levelType.compareTo(a.levelType);
-                return b.point.compareTo(a.point);
-              });
+            final items =
+                _scoreboardData
+                    .where((s) => s.skillType == meta.skillType)
+                    .toList()
+                  ..sort((a, b) {
+                    if (b.levelType != a.levelType)
+                      return b.levelType.compareTo(a.levelType);
+                    return b.point.compareTo(a.point);
+                  });
 
             return TweenAnimationBuilder<double>(
               tween: Tween(begin: 0.0, end: 1.0),
@@ -134,7 +136,7 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
         border: Border.all(color: meta.lightColor, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: meta.color.withOpacity(0.08),
+            color: meta.color.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -166,9 +168,12 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: meta.color.withOpacity(0.12),
+                    color: meta.color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -198,7 +203,7 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: items.length,
-              separatorBuilder: (_, __) => const Divider(
+              separatorBuilder: (_, _) => const Divider(
                 height: 1,
                 color: Color(0xFFF1F5F9),
                 indent: 16,
@@ -236,7 +241,10 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
                 }
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
                   child: Row(
                     children: [
                       SizedBox(width: 28, child: Center(child: rankWidget)),
@@ -255,7 +263,10 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
                             ),
                             const SizedBox(height: 2),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: meta.lightColor,
                                 borderRadius: BorderRadius.circular(6),
@@ -273,10 +284,16 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [meta.color, meta.color.withOpacity(0.75)],
+                            colors: [
+                              meta.color,
+                              meta.color.withValues(alpha: 0.75),
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(10),
                         ),

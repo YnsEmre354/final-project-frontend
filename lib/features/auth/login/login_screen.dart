@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/login_enum.dart';
+import 'package:flutter_turkce_ogrenme_application/data/services/firebase_auth_service.dart';
 import 'package:flutter_turkce_ogrenme_application/data/services/student_service.dart';
 import 'package:flutter_turkce_ogrenme_application/features/admin/presentation/admin_login_screen.dart';
+import 'package:flutter_turkce_ogrenme_application/features/auth/forgot_password/forgot_password_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/login/login_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/register/register_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/user/user_provider.dart';
@@ -160,7 +162,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
               decoration: BoxDecoration(
                 boxShadow: [
                   BoxShadow(
-                    color: duoBlue.withOpacity(0.4),
+                    color: duoBlue.withValues(alpha: 0.4),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -187,7 +189,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                             _resetControllers();
                             if (!context.mounted) return;
                             // Yeni kullanıcı mı kontrol et
-                            final enrollments = await StudentService().getUserEnrollment();
+                            final enrollments = await StudentService()
+                                .getUserEnrollment();
                             if (!context.mounted) return;
                             Navigator.pushAndRemoveUntil(
                               context,
@@ -225,6 +228,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            );
+                            break;
+
+                          case LoginResult.emailNotVerified:
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text(
+                                  'E-posta adresiniz doğrulanmamış. Lütfen gelen kutunuzu kontrol edin.',
+                                ),
+                                backgroundColor: Colors.orange.shade700,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                action: SnackBarAction(
+                                  label: 'Tekrar Gönder',
+                                  textColor: Colors.white,
+                                  onPressed: () async {
+                                    try {
+                                      await FirebaseAuthService()
+                                          .sendEmailVerification();
+                                      if (!context.mounted) return;
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: const Text(
+                                            'Doğrulama e-postası gönderildi.',
+                                          ),
+                                          backgroundColor:
+                                              Colors.green.shade600,
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    } catch (_) {}
+                                  },
                                 ),
                               ),
                             );
@@ -300,6 +341,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with RouteAware {
                 ),
               ],
             ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ForgotPasswordScreen(),
+                  ),
+                );
+              },
+              child: Text(
+                'Şifremi Unuttum',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -330,6 +389,7 @@ class LoginTextField extends StatelessWidget {
   final VoidCallback? onTap;
 
   const LoginTextField({
+    super.key,
     required this.controller,
     required this.isObscureText,
     required this.hintText,

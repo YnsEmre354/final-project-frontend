@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "392159269720",
+    "project_id": "bitirme-b3e7a",
+    "storage_bucket": "bitirme-b3e7a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392159269720:android:00d448f391053246c24b2d",
+        "android_client_info": {
+          "package_name": "com.example.flutter_turkce_ogrenme_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8EGARmdisJiTaZ-XLbxxrt52MowumhVQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

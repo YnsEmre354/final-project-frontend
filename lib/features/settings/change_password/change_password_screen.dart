@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/change_password_enum.dart';
+import 'package:flutter_turkce_ogrenme_application/features/auth/forgot_password/forgot_password_screen.dart';
 import 'package:flutter_turkce_ogrenme_application/features/settings/change_password/change_password_provider.dart';
 import 'package:flutter_turkce_ogrenme_application/main.dart';
 
@@ -101,7 +102,7 @@ class _ChangePasswordScreen extends ConsumerState<ChangePasswordScreen>
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: duoBlue.withOpacity(0.15),
+                      color: duoBlue.withValues(alpha: 0.15),
                       blurRadius: 20,
                       offset: const Offset(0, 6),
                     ),
@@ -148,7 +149,80 @@ class _ChangePasswordScreen extends ConsumerState<ChangePasswordScreen>
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 16),
+
+              // ── Firebase info banner ──────────────────────────────────────────
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3E0),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFFFFB74D),
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.info_outline_rounded,
+                          color: Color(0xFFE65100),
+                          size: 22,
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text(
+                            'Firebase ile Kimlik Doğrulama',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFE65100),
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Hesabınız Firebase Authentication ile yönetilmektedir. '
+                      'Şifrenizi değiştirmek için Firebase şifre sıfırlama özelliğini kullanabilirsiniz.',
+                      style: TextStyle(
+                        color: Color(0xFFBF360C),
+                        fontSize: 13,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.lock_reset_rounded, size: 18),
+                        label: const Text('Firebase ile Şifre Sıfırla'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ForgotPasswordScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFE65100),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
 
               Container(
                 padding: const EdgeInsets.all(20),
@@ -157,7 +231,7 @@ class _ChangePasswordScreen extends ConsumerState<ChangePasswordScreen>
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -234,10 +308,10 @@ class _ChangePasswordScreen extends ConsumerState<ChangePasswordScreen>
                         margin: const EdgeInsets.only(top: 16),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: errorRed.withOpacity(0.08),
+                          color: errorRed.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: errorRed.withOpacity(0.3),
+                            color: errorRed.withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
@@ -367,7 +441,7 @@ class _ChangePasswordScreen extends ConsumerState<ChangePasswordScreen>
             boxShadow: [
               if (isEnabled)
                 BoxShadow(
-                  color: const Color(0xFF1899D6).withOpacity(0.5),
+                  color: const Color(0xFF1899D6).withValues(alpha: 0.5),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),

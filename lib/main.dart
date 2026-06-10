@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_turkce_ogrenme_application/core/services/local_notification_service.dart';
 import 'package:flutter_turkce_ogrenme_application/features/splash/splash_screen.dart';
+import 'package:flutter_turkce_ogrenme_application/firebase_options.dart';
 
 /*
 Duzeltilcek Hatalar {
@@ -21,10 +23,16 @@ void main() async {
   await LocalNotificationService.init();
   HttpOverrides.global = MyHttpOverrides();
 
+  // Initialize Firebase before anything else
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyHttpOverrides extends HttpOverrides {
+
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)

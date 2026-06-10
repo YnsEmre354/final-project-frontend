@@ -52,11 +52,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(
-              Icons.admin_panel_settings,
-              size: 80,
-              color: duoBlue,
-            ),
+            const Icon(Icons.admin_panel_settings, size: 80, color: duoBlue),
             const SizedBox(height: 20),
             if (adminState.error != null)
               Text(
@@ -129,7 +125,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
               decoration: BoxDecoration(
                 boxShadow: [
                   BoxShadow(
-                    color: duoBlue.withOpacity(0.4),
+                    color: duoBlue.withValues(alpha: 0.4),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -153,7 +149,8 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const AdminDashboardScreen(),
+                              builder: (context) =>
+                                  const AdminDashboardScreen(),
                             ),
                           );
                         } else {

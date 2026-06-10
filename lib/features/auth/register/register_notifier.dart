@@ -1,13 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_turkce_ogrenme_application/data/enum/register_enum.dart';
-import 'package:flutter_turkce_ogrenme_application/data/services/student_service.dart';
+import 'package:flutter_turkce_ogrenme_application/data/services/firebase_auth_service.dart';
 import 'package:flutter_turkce_ogrenme_application/features/auth/register/register_state.dart';
 
 class RegisterNotifier extends StateNotifier<RegisterState> {
-  final StudentService _service;
+  final FirebaseAuthService _firebaseAuth;
 
-  RegisterNotifier(this._service) : super(RegisterState());
+  RegisterNotifier(this._firebaseAuth) : super(RegisterState());
 
+  /// Firebase register flow:
+  /// 1. Create Firebase user with email + password.
+  /// 2. Send email verification.
+  /// 3. Cache form data in state.pendingUserData.
+  /// 4. Return emailVerificationSent — screen navigates to EmailVerificationScreen.
   Future<RegisterEnumResult> register({
     required String name,
     required String surname,
@@ -18,26 +24,35 @@ class RegisterNotifier extends StateNotifier<RegisterState> {
     required String gender,
   }) async {
     try {
-      state = state.copyWith(isLoading: true, error: null);
+      state = state.copyWith(isLoading: true, clearError: true);
 
-      final result = await _service.registerStudent(
-        name: name,
-        surname: surname,
-        username: username,
+      await _firebaseAuth.createUserAndSendVerification(
         email: email,
         password: password,
-        nativeLanguage: nativeLanguage,
-        gender: gender,
       );
-      state = state.copyWith(isLoading: false);
 
-      if (result == RegisterEnumResult.emailTaken) {
-        state = state.copyWith(error: "Bu Email Adresi Zaten Kayitli!");
-      } else if (result == RegisterEnumResult.usernameTaken) {
-        state = state.copyWith(error: "Bu Kullanici Adi Zaten Kayitli!");
+      // Store form data so EmailVerificationScreen can complete backend registration
+      state = state.copyWith(
+        isLoading: false,
+        pendingUserData: {
+          'name': name,
+          'surname': surname,
+          'username': username,
+          'email': email,
+          'nativeLanguage': nativeLanguage,
+          'gender': gender,
+        },
+      );
+
+      return RegisterEnumResult.emailVerificationSent;
+    } on FirebaseAuthException catch (e) {
+      final message = FirebaseAuthService.turkishErrorMessage(e);
+      state = state.copyWith(isLoading: false, error: message);
+
+      if (e.code == 'email-already-in-use') {
+        return RegisterEnumResult.emailTaken;
       }
-
-      return result;
+      return RegisterEnumResult.error;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
       return RegisterEnumResult.error;

@@ -92,6 +92,83 @@ class StudentService {
     }
   }
 
+  // ── Firebase: Login ────────────────────────────────────────────────────────
+
+  /// Exchanges a Firebase ID token for the project's own JWT token.
+  /// Called after Firebase sign-in succeeds and emailVerified is true.
+  Future<(LoginResult, LoginResponseDto?)> firebaseLogin(String idToken) async {
+    try {
+      final response = await _dio.post(
+        '/Student/firebase-login',
+        data: {'idToken': idToken},
+      );
+      if (response.statusCode == 200) {
+        final data = LoginResponseDto.fromJson(response.data);
+        return (LoginResult.success, data);
+      }
+      return (LoginResult.error, null);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 403) {
+        return (LoginResult.accountPassive, null);
+      }
+      if (e.response?.statusCode == 401) {
+        return (LoginResult.emailNotVerified, null);
+      }
+      if (e.response?.statusCode == 400 || e.response?.statusCode == 404) {
+        return (LoginResult.invalidCredentials, null);
+      }
+      return (LoginResult.error, null);
+    } catch (e) {
+      return (LoginResult.error, null);
+    }
+  }
+
+  // ── Firebase: Complete Registration ────────────────────────────────────────
+
+  /// Finalises backend student registration after Firebase email is verified.
+  /// Sends the Firebase ID token + profile data to create the DB record.
+  Future<RegisterEnumResult> completeFirebaseRegister({
+    required String idToken,
+    required String name,
+    required String surname,
+    required String username,
+    required String nativeLanguage,
+    required String gender,
+  }) async {
+    try {
+      print('Endpoint URL: ${_dio.options.baseUrl}/Student/complete-firebase-register');
+      final response = await _dio.post(
+        '/Student/complete-firebase-register',
+        data: {
+          'idToken': idToken,
+          'name': name,
+          'surname': surname,
+          'username': username,
+          'nativeLanguage': nativeLanguage,
+          'gender': gender,
+        },
+      );
+      print('Dio status code: ${response.statusCode}');
+      print('Dio response body: ${response.data}');
+      return RegisterEnumResult.success;
+    } on DioException catch (e) {
+      print('Dio error status: ${e.response?.statusCode}');
+      print('Dio error response body: ${e.response?.data}');
+      if (e.response?.statusCode == 409) {
+        final field = e.response?.data['field'];
+        if (field == 'Email') return RegisterEnumResult.emailTaken;
+        if (field == 'Username') return RegisterEnumResult.usernameTaken;
+      }
+      if (e.response?.statusCode == 400) {
+        return RegisterEnumResult.error;
+      }
+      return RegisterEnumResult.error;
+    } catch (e) {
+      print('Unexpected error in completeFirebaseRegister: $e');
+      return RegisterEnumResult.error;
+    }
+  }
+
   Future<LogUserDto?> getLogStudent() async {
     try {
       final response = await _dio.get('/Student/log-student');
